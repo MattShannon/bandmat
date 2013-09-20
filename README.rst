@@ -39,25 +39,14 @@ The bandmat package provides:
     This is included for (the author's) convenience and is not specific to
     banded matrices.
 
-Set-up
-------
-
-The latest version of bandmat is available from a github repository (see
-below).
-Required packages are numpy, scipy and cython.
-
-To compile the cython part of bandmat in the current directory::
-
-    python setup.py build_ext --inplace
-
 License
 -------
 
 Please see the file ``License`` for details of the license and warranty for
 bandmat.
 
-Source
-------
+Development
+-----------
 
 The source code is hosted in the
 `bandmat github repository <https://github.com/MattShannon/bandmat>`_.
@@ -68,6 +57,12 @@ To obtain the latest source code using git::
 Development is in fact done using `darcs <http://darcs.net/>`_, with the darcs
 repository converted to a git repository using
 `darcs-to-git <https://github.com/purcell/darcs-to-git>`_.
+
+To compile the cython part of bandmat in the current directory::
+
+    python setup.py build_ext --inplace
+
+This command must be run after every modification to the source ``.pyx`` files.
 
 Bugs
 ----
