@@ -1,3 +1,4 @@
+"""Core banded matrix definitions and functions (fast cython code)."""
 
 # Copyright 2013 Matt Shannon
 

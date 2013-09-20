@@ -1,3 +1,4 @@
+"""Tests for the bandmat package."""
 
 # Copyright 2013 Matt Shannon
 
