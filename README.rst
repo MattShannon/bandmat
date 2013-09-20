@@ -24,20 +24,20 @@ scipy.linalg.solve_banded.
 
 The bandmat package provides:
 
-  - some basic banded matrix operations not present in scipy.
-    For example, banded matrix-vector multiplication is defined by BLAS but not
-    wrapped by scipy, and banded matrix-matrix multiplication is not defined in
-    BLAS or in scipy.
-    The bandmat package contains C implementations of these operations written
-    in cython.
-  - helper functions for converting between full and banded matrix
-    representations.
-  - certain linear algebra operations on banded matrices.
-    Currently the only supported operation is finding the band of the inverse
-    of a positive definite banded matrix.
-  - an implementation of a fancy indexed += function for numpy arrays.
-    This is included for (the author's) convenience and is not specific to
-    banded matrices.
+- some basic banded matrix operations not present in scipy.
+  For example, banded matrix-vector multiplication is defined by BLAS but not
+  wrapped by scipy, and banded matrix-matrix multiplication is not defined in
+  BLAS or in scipy.
+  The bandmat package contains C implementations of these operations written in
+  cython.
+- helper functions for converting between full and banded matrix
+  representations.
+- certain linear algebra operations on banded matrices.
+  Currently the only supported operation is finding the band of the inverse of
+  a positive definite banded matrix.
+- an implementation of a fancy indexed += function for numpy arrays.
+  This is included for (the author's) convenience and is not specific to banded
+  matrices.
 
 License
 -------
