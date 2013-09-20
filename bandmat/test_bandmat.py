@@ -346,7 +346,7 @@ class TestBandMat(unittest.TestCase):
             targetSize = random.choice([1, randint(1, 10), randint(1, 100)])
             source = randn(sourceSize)
             target = randn(targetSize)
-            targetIndexSeq = np.array([ np.random.randint(targetSize)
+            targetIndexSeq = np.array([ randint(targetSize)
                                         for _ in range(sourceSize) ],
                                       dtype = np.int64)
 
@@ -364,7 +364,7 @@ class TestBandMat(unittest.TestCase):
             targetSize = random.choice([1, randint(1, 10), randint(1, 100)])
             source = randn(sourceSize)
             target = randn(targetSize)
-            targetIndexSeq = np.array([ np.random.randint(targetSize)
+            targetIndexSeq = np.array([ randint(targetSize)
                                         for _ in range(sourceSize) ],
                                       dtype = np.int64)
             targetIndexSeq[randint(sourceSize)] = (
@@ -382,7 +382,7 @@ class TestBandMat(unittest.TestCase):
             size1 = random.choice([0, 1, randint(10)])
             source = randn(sourceSize, size1)
             target = randn(targetSize, size1)
-            targetIndexSeq = np.array([ np.random.randint(targetSize)
+            targetIndexSeq = np.array([ randint(targetSize)
                                         for _ in range(sourceSize) ],
                                       dtype = np.int64)
 
@@ -401,7 +401,7 @@ class TestBandMat(unittest.TestCase):
             size1 = random.choice([1, randint(1, 10)])
             source = randn(sourceSize, size1)
             target = randn(targetSize, size1)
-            targetIndexSeq = np.array([ np.random.randint(targetSize)
+            targetIndexSeq = np.array([ randint(targetSize)
                                         for _ in range(sourceSize) ],
                                       dtype = np.int64)
             targetIndexSeq[randint(sourceSize)] = (
