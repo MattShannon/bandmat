@@ -9,15 +9,39 @@
 import os
 from distutils.core import setup
 from distutils.extension import Extension
-from Cython.Distutils import build_ext
+from distutils.command.sdist import sdist
+
+cython_locs = [
+    ('bandmat', 'core_fast'),
+]
 
 with open('README.rst') as readmeFile:
     long_description = readmeFile.read()
 
-ext_modules = [
-    Extension('bandmat.core_fast',
-              [os.path.join('bandmat', 'core_fast.pyx')]),
-]
+# see "A note on setup.py" in README.rst for an explanation of the dev file
+dev_mode = os.path.exists('dev')
+
+if dev_mode:
+    from Cython.Distutils import build_ext as cython_build_ext
+    from Cython.Build import cythonize
+
+    class cythonizing_sdist(sdist):
+        """A cythonizing sdist command.
+
+        This class is a custom sdist command which ensures all cython-generated
+        C files are up-to-date before running the conventional sdist command.
+        """
+        def run(self):
+            cythonize([ os.path.join(*loc)+'.pyx' for loc in cython_locs ])
+            sdist.run(self)
+
+    cmdclass = {'build_ext': cython_build_ext, 'sdist': cythonizing_sdist}
+    ext_modules = [ Extension('.'.join(loc), [os.path.join(*loc)+'.pyx'])
+                    for loc in cython_locs ]
+else:
+    cmdclass = {}
+    ext_modules = [ Extension('.'.join(loc), [os.path.join(*loc)+'.c'])
+                    for loc in cython_locs ]
 
 setup(
     name = 'bandmat',
@@ -29,6 +53,6 @@ setup(
     license = '3-clause BSD (see License file)',
     packages = ['bandmat'],
     long_description = long_description,
-    cmdclass = {'build_ext': build_ext},
+    cmdclass = cmdclass,
     ext_modules = ext_modules,
 )

@@ -64,6 +64,26 @@ To compile the cython part of bandmat in the current directory::
 
 This command must be run after every modification to the source ``.pyx`` files.
 
+A note on ``setup.py``
+----------------------
+
+The included ``setup.py`` file operates in one of two modes depending on
+whether or not the file ``dev`` is present in the project root directory.
+In development mode (``dev`` present, as for the github repository), the
+``build_ext`` command uses cython to compile cython modules from their ``.pyx``
+source, and the ``sdist`` command is modified to first use cython to compile
+cython modules from their ``.pyx`` source to ``.c`` files.
+In distribution mode (``dev`` absent, as for source distributions), the
+``build_ext`` command uses a C compiler to directly compile
+cython modules from the corresponding ``.c`` files.
+This approach ensures that source distributions can be installed on systems
+without cython or with an incompatible version of cython, while ensuring that
+distributed ``.c`` files are always up-to-date and that the source ``.pyx``
+files are used instead of ``.c`` files during development.
+
+The author would welcome any suggestions for more elegant ways to achieve a
+similar effect to the approach described above!
+
 Bugs
 ----
 
