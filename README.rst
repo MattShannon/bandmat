@@ -39,6 +39,22 @@ The bandmat package provides:
   This is included for (the author's) convenience and is not specific to banded
   matrices.
 
+Installation
+------------
+
+For most purposes the simplest way to install bandmat is to use pip::
+
+    sudo pip install bandmat
+
+This installs the latest released version of
+`bandmat on PyPI <https://pypi.python.org/pypi/bandmat>`_.
+Alternatively you can download bandmat from PyPI and install it using::
+
+    sudo python setup.py install
+
+The latest development version of bandmat is available from a github repository
+(see below).
+
 Usage
 -----
 
@@ -82,8 +98,8 @@ In development mode (``dev`` present, as for the github repository), the
 ``build_ext`` command uses cython to compile cython modules from their ``.pyx``
 source, and the ``sdist`` command is modified to first use cython to compile
 cython modules from their ``.pyx`` source to ``.c`` files.
-In distribution mode (``dev`` absent, as for source distributions), the
-``build_ext`` command uses a C compiler to directly compile
+In distribution mode (``dev`` absent, as for source distributions such as the
+code on PyPI), the ``build_ext`` command uses a C compiler to directly compile
 cython modules from the corresponding ``.c`` files.
 This approach ensures that source distributions can be installed on systems
 without cython or with an incompatible version of cython, while ensuring that
