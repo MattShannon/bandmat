@@ -39,6 +39,15 @@ The bandmat package provides:
   This is included for (the author's) convenience and is not specific to banded
   matrices.
 
+Usage
+-----
+
+The python script ``example.py`` contains some simple examples of how the
+bandmat package may be used.
+To run it::
+
+    python example.py
+
 License
 -------
 
