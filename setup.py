@@ -12,6 +12,7 @@ from distutils.extension import Extension
 from distutils.command.sdist import sdist
 
 cython_locs = [
+    ('bandmat', 'full'),
     ('bandmat', 'core_fast'),
 ]
 
