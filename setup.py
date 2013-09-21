@@ -9,7 +9,7 @@
 import os
 from distutils.core import setup
 from distutils.extension import Extension
-from distutils.command.sdist import sdist
+from distutils.command.sdist import sdist as _sdist
 
 cython_locs = [
     ('bandmat', 'full'),
@@ -23,10 +23,10 @@ with open('README.rst') as readmeFile:
 dev_mode = os.path.exists('dev')
 
 if dev_mode:
-    from Cython.Distutils import build_ext as cython_build_ext
+    from Cython.Distutils import build_ext
     from Cython.Build import cythonize
 
-    class cythonizing_sdist(sdist):
+    class sdist(_sdist):
         """A cythonizing sdist command.
 
         This class is a custom sdist command which ensures all cython-generated
@@ -34,9 +34,9 @@ if dev_mode:
         """
         def run(self):
             cythonize([ os.path.join(*loc)+'.pyx' for loc in cython_locs ])
-            sdist.run(self)
+            _sdist.run(self)
 
-    cmdclass = {'build_ext': cython_build_ext, 'sdist': cythonizing_sdist}
+    cmdclass = {'build_ext': build_ext, 'sdist': sdist}
     ext_modules = [ Extension('.'.join(loc), [os.path.join(*loc)+'.pyx'])
                     for loc in cython_locs ]
 else:
