@@ -1,9 +1,20 @@
 language: python
+
 python:
   - "2.7"
   - "2.6"
+
+virtualenv:
+  system_site_packages: true
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install cython python-numpy python-scipy
+  - cython bandmat/full.pyx
+  - cython bandmat/core_fast.pyx
+
 install:
-  - pip install -r requirements.txt --use-mirrors
   - python setup.py build_ext --inplace
+
 script:
   - python -m unittest discover bandmat
