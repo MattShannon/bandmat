@@ -21,6 +21,7 @@ cimport cython
 cnp.import_array()
 cnp.import_ufunc()
 
+@cython.boundscheck(False)
 def band_e(long l, long u, cnp.ndarray[cnp.float64_t, ndim=2] mat_full):
     """Extracts the band of a full, square, banded matrix.
 
@@ -54,6 +55,7 @@ def band_e(long l, long u, cnp.ndarray[cnp.float64_t, ndim=2] mat_full):
 
     return mat_rect
 
+@cython.boundscheck(False)
 def band_c(long l, long u, cnp.ndarray[cnp.float64_t, ndim=2] mat_rect):
     """Constructs a full, square, banded matrix from its band.
 
@@ -86,6 +88,7 @@ def band_c(long l, long u, cnp.ndarray[cnp.float64_t, ndim=2] mat_rect):
 
     return mat_full
 
+@cython.boundscheck(False)
 def zero_extra_entries(long l, long u,
                        cnp.ndarray[cnp.float64_t, ndim=2] mat_rect):
     """Zeroes the extra entries of a rectangular matrix.
