@@ -1,7 +1,7 @@
 """Banded operations on full matrices.
 
-More precisely, this module provides operations involving the bands of square
-matrices that are stored using the conventional numpy matrix representation.
+This module provides operations involving the bands of square matrices that are
+stored using the conventional numpy matrix representation.
 
 The (l, u)-extra entries of a rectangular matrix `mat_rect` are defined as the
 entries which have no effect on the result of `band_c(l, u, mat_rect)`.
