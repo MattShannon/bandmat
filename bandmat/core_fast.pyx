@@ -7,13 +7,13 @@
 
 import numpy as np
 
-cimport numpy as np
+cimport numpy as cnp
 cimport cython
 
 @cython.boundscheck(False)
 def dot_vector_banded(a_lu_tuple,
-                      np.ndarray[np.float64_t, ndim=2] a_banded,
-                      np.ndarray[np.float64_t, ndim=1] b,
+                      cnp.ndarray[cnp.float64_t, ndim=2] a_banded,
+                      cnp.ndarray[cnp.float64_t, ndim=1] b,
                       long transpose = False,
                       target = None):
     """Multiplies a banded matrix by a vector.
@@ -27,7 +27,7 @@ def dot_vector_banded(a_lu_tuple,
     # (FIXME : could wrap corresponding BLAS routine (gbmv) instead)
     cdef long frames
     cdef long l_a, u_a
-    cdef np.ndarray[np.float64_t, ndim=1] c
+    cdef cnp.ndarray[cnp.float64_t, ndim=1] c
 
     if transpose:
         u_a, l_a = a_lu_tuple
@@ -63,7 +63,7 @@ def dot_vector_banded(a_lu_tuple,
 
 @cython.boundscheck(False)
 def dot_matrix_banded_add(a_rep, b_rep, target_rep,
-                          np.ndarray[np.float64_t, ndim=1] diag = None,
+                          cnp.ndarray[cnp.float64_t, ndim=1] diag = None,
                           long transpose_a = False,
                           long transpose_b = False):
     """Banded matrix multiplication (existing target).
@@ -86,9 +86,9 @@ def dot_matrix_banded_add(a_rep, b_rep, target_rep,
     cdef long l_b, u_b
     cdef long l_c, u_c
     cdef long use_diag
-    cdef np.ndarray[np.float64_t, ndim=2] a_banded
-    cdef np.ndarray[np.float64_t, ndim=2] b_banded
-    cdef np.ndarray[np.float64_t, ndim=2] c_banded
+    cdef cnp.ndarray[cnp.float64_t, ndim=2] a_banded
+    cdef cnp.ndarray[cnp.float64_t, ndim=2] b_banded
+    cdef cnp.ndarray[cnp.float64_t, ndim=2] c_banded
 
     if transpose_a:
         u_a, l_a, a_banded = a_rep
@@ -133,8 +133,8 @@ def dot_matrix_banded_add(a_rep, b_rep, target_rep,
     return
 
 @cython.boundscheck(False)
-def band_of_outer_add(np.ndarray[np.float64_t, ndim=1] a_vec,
-                      np.ndarray[np.float64_t, ndim=1] b_vec,
+def band_of_outer_add(cnp.ndarray[cnp.float64_t, ndim=1] a_vec,
+                      cnp.ndarray[cnp.float64_t, ndim=1] b_vec,
                       target_rep,
                       double mult = 1.0):
     """Adds the outer product of two vectors to a banded matrix.
@@ -145,7 +145,7 @@ def band_of_outer_add(np.ndarray[np.float64_t, ndim=1] a_vec,
     """
     cdef long frames
     cdef long l, u
-    cdef np.ndarray[np.float64_t, ndim=2] mat_banded
+    cdef cnp.ndarray[cnp.float64_t, ndim=2] mat_banded
 
     frames = a_vec.shape[0]
     assert b_vec.shape[0] == frames
@@ -166,7 +166,7 @@ def band_of_outer_add(np.ndarray[np.float64_t, ndim=1] a_vec,
     return
 
 @cython.boundscheck(False)
-def band_of_inverse_from_chol(np.ndarray[np.float64_t, ndim=2] chol_banded):
+def band_of_inverse_from_chol(cnp.ndarray[cnp.float64_t, ndim=2] chol_banded):
     """Computes band of the inverse of a positive definite banded matrix.
 
     Computes band of the inverse of a positive definite banded matrix given its
@@ -179,7 +179,7 @@ def band_of_inverse_from_chol(np.ndarray[np.float64_t, ndim=2] chol_banded):
     """
     cdef unsigned long depth
     cdef long frames
-    cdef np.ndarray[np.float64_t, ndim=2] cov_banded
+    cdef cnp.ndarray[cnp.float64_t, ndim=2] cov_banded
 
     depth = chol_banded.shape[0] - 1
     frames = chol_banded.shape[1]
@@ -213,9 +213,9 @@ def band_of_inverse_from_chol(np.ndarray[np.float64_t, ndim=2] chol_banded):
     return cov_banded
 
 # FIXME : move elsewhere (nothing to do with banded matrices)
-def plusEquals(np.ndarray[np.int64_t, ndim=1] targetIndexSeq,
-               np.ndarray[np.float64_t, ndim=1] source,
-               np.ndarray[np.float64_t, ndim=1] target):
+def plusEquals(cnp.ndarray[cnp.int64_t, ndim=1] targetIndexSeq,
+               cnp.ndarray[cnp.float64_t, ndim=1] source,
+               cnp.ndarray[cnp.float64_t, ndim=1] target):
     """Implements a += method with fancy indexing.
 
     Does what you might expect
@@ -237,9 +237,9 @@ def plusEquals(np.ndarray[np.int64_t, ndim=1] targetIndexSeq,
     return
 
 # FIXME : move elsewhere (nothing to do with banded matrices)
-def plusEquals2D(np.ndarray[np.int64_t, ndim=1] targetIndexSeq,
-                 np.ndarray[np.float64_t, ndim=2] source,
-                 np.ndarray[np.float64_t, ndim=2] target):
+def plusEquals2D(cnp.ndarray[cnp.int64_t, ndim=1] targetIndexSeq,
+                 cnp.ndarray[cnp.float64_t, ndim=2] source,
+                 cnp.ndarray[cnp.float64_t, ndim=2] target):
     """Implements a += method with fancy indexing.
 
     Does what you might expect
