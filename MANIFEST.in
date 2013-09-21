@@ -1,4 +1,4 @@
 include License
 include README.rst
-include bandmat/core_fast.c
+include bandmat/*.c
 include example.py
