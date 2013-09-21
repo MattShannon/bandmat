@@ -15,8 +15,13 @@ They lie in the upper-left and bottom-right corners of `mat_rect`.
 
 import numpy as np
 
-# FIXME : write more efficient (and arguably simpler?) cython implementation?
-def band_e(l, u, mat_full):
+cimport numpy as cnp
+cimport cython
+
+cnp.import_array()
+cnp.import_ufunc()
+
+def band_e(long l, long u, cnp.ndarray[cnp.float64_t, ndim=2] mat_full):
     """Extracts the band of a full, square, banded matrix.
 
     Given a square numpy matrix `mat_full`, returns a rectangular numpy matrix
@@ -30,22 +35,26 @@ def band_e(l, u, mat_full):
     """
     assert l >= 0
     assert u >= 0
-    size = len(mat_full)
-    assert np.shape(mat_full) == (size, size)
+    assert mat_full.shape[1] == mat_full.shape[0]
 
+    cdef long size
+    cdef cnp.ndarray[cnp.float64_t, ndim=2] mat_rect
+
+    size = mat_full.shape[0]
     mat_rect = np.zeros((l + u + 1, size))
-    mat_rect[u] = np.diag(mat_full)
-    for offset in range(1, u + 1):
-        if offset <= size:
-            mat_rect[u - offset, offset:size] = np.diag(mat_full, offset)
-    for offset in range(1, l + 1):
-        if offset <= size:
-            mat_rect[u + offset, 0:(size - offset)] = np.diag(mat_full, -offset)
+
+    cdef long i
+    cdef unsigned long row
+    cdef unsigned long j
+
+    for i in range(-u, l + 1):
+        row = u + i
+        for j in range(max(0, -i), max(0, size + min(0, -i))):
+            mat_rect[row, j] = mat_full[j + i, j]
 
     return mat_rect
 
-# FIXME : write much more efficient cython implementation
-def band_c(l, u, mat_rect):
+def band_c(long l, long u, cnp.ndarray[cnp.float64_t, ndim=2] mat_rect):
     """Constructs a full, square, banded matrix from its band.
 
     Given a rectangular numpy matrix `mat_rect`, returns a square numpy matrix
@@ -58,23 +67,27 @@ def band_c(l, u, mat_rect):
     """
     assert l >= 0
     assert u >= 0
-    size = np.shape(mat_rect)[1]
-    assert np.shape(mat_rect) == (l + u + 1, size)
+    assert mat_rect.shape[0] == l + u + 1
 
-    mat_full = np.diag(mat_rect[u])
-    for offset in range(1, u + 1):
-        if offset <= size:
-            # (FIXME : could make this more efficient)
-            mat_full += np.diag(mat_rect[u - offset, offset:size], offset)
-    for offset in range(1, l + 1):
-        if offset <= size:
-            # (FIXME : could make this more efficient)
-            mat_full += np.diag(mat_rect[u + offset, 0:(size - offset)],
-                                -offset)
+    cdef long size
+    cdef cnp.ndarray[cnp.float64_t, ndim=2] mat_full
+
+    size = mat_rect.shape[1]
+    mat_full = np.zeros((size, size))
+
+    cdef long i
+    cdef unsigned long row
+    cdef unsigned long j
+
+    for i in range(-u, l + 1):
+        row = u + i
+        for j in range(max(0, -i), max(0, size + min(0, -i))):
+            mat_full[j + i, j] = mat_rect[row, j]
 
     return mat_full
 
-def zero_extra_entries(l, u, mat_rect):
+def zero_extra_entries(long l, long u,
+                       cnp.ndarray[cnp.float64_t, ndim=2] mat_rect):
     """Zeroes the extra entries of a rectangular matrix.
 
     Equivalent to:
@@ -85,13 +98,26 @@ def zero_extra_entries(l, u, mat_rect):
     """
     assert l >= 0
     assert u >= 0
-    size = np.shape(mat_rect)[1]
-    assert np.shape(mat_rect) == (l + u + 1, size)
+    assert mat_rect.shape[0] == l + u + 1
 
-    for offset in range(1, u + 1):
-        mat_rect[u - offset, 0:min(offset, size)] = 0.0
-    for offset in range(1, l + 1):
-        mat_rect[u + offset, max(size - offset, 0):size] = 0.0
+    cdef long size
+
+    size = mat_rect.shape[1]
+
+    cdef long i
+    cdef unsigned long row
+    cdef unsigned long j
+
+    for i in range(-u, 0):
+        row = u + i
+        for j in range(0, min(size, -i)):
+            mat_rect[row, j] = 0.0
+    for i in range(1, l + 1):
+        row = u + i
+        for j in range(max(0, size - i), size):
+            mat_rect[row, j] = 0.0
+
+    return
 
 def band_ce(l, u, mat_rect):
     """Copies a rectangular matrix and zeroes its extra entries."""
