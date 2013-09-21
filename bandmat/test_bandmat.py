@@ -5,6 +5,8 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
+from bandmat.testhelp import assert_allclose, assert_allequal
+
 import bandmat as bm
 
 import unittest
@@ -13,14 +15,6 @@ import numpy.linalg as la
 import scipy.linalg as sla
 import random
 from numpy.random import randn, randint
-
-def assert_allclose(actual, desired, rtol = 1e-7, atol = 1e-14, msg = 'items not almost equal'):
-    if np.shape(actual) != np.shape(desired) or not np.allclose(actual, desired, rtol, atol):
-        raise AssertionError(msg+'\n ACTUAL:\n'+repr(actual)+'\n DESIRED:\n'+repr(desired))
-
-def assert_allequal(actual, desired, msg = 'items not equal'):
-    if np.shape(actual) != np.shape(desired) or not np.all(actual == desired):
-        raise AssertionError(msg+'\n ACTUAL:\n'+repr(actual)+'\n DESIRED:\n'+repr(desired))
 
 def randBool():
     return randint(0, 2) == 0
