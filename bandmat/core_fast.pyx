@@ -10,6 +10,9 @@ import numpy as np
 cimport numpy as cnp
 cimport cython
 
+cnp.import_array()
+cnp.import_ufunc()
+
 @cython.boundscheck(False)
 def dot_vector_banded(a_lu_tuple,
                       cnp.ndarray[cnp.float64_t, ndim=2] a_banded,
