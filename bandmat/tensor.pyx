@@ -83,8 +83,7 @@ def plus(a_bm, b_bm):
     where `a_full` and `b_full` are square numpy arrays.
     """
     assert a_bm.size == b_bm.size
-    c_bm = bm_core.zeros(max(a_bm.l, b_bm.l), max(a_bm.u, b_bm.u), a_bm.size)
-    plus_equals_band_of(c_bm, a_bm)
+    c_bm = a_bm.equiv(l_new = max(a_bm.l, b_bm.l), u_new = max(a_bm.u, b_bm.u))
     plus_equals_band_of(c_bm, b_bm)
     return c_bm
 

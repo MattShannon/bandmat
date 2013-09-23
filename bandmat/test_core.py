@@ -102,16 +102,41 @@ class TestCore(unittest.TestCase):
             mat_bm_new.data += 1.0
             assert_allequal(mat_bm.full(), mat_full_orig)
 
-    def test_BandMat_canonicalized(self, its = 50):
+    def test_BandMat_equiv(self, its = 50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mat_bm = gen_BandMat(size)
+            l_new = random.choice([None, 0, 1, randint(0, 10)])
+            u_new = random.choice([None, 0, 1, randint(0, 10)])
+            transposed_new = random.choice([None, True, False])
+            zero_extra = randBool()
 
-            mat_bm_new = mat_bm.canonicalized()
-            assert mat_bm_new.l == mat_bm.l
-            assert mat_bm_new.u == mat_bm.u
-            assert not mat_bm_new.transposed
-            assert_allequal(mat_bm_new.full(), mat_bm.full())
+            l_new_value = mat_bm.l if l_new is None else l_new
+            u_new_value = mat_bm.u if u_new is None else u_new
+            transposed_new_value = (mat_bm.transposed if transposed_new is None
+                                    else transposed_new)
+
+            if l_new_value < mat_bm.l or u_new_value < mat_bm.u:
+                self.assertRaises(AssertionError,
+                                  mat_bm.equiv,
+                                  l_new = l_new, u_new = u_new,
+                                  transposed_new = transposed_new,
+                                  zero_extra = zero_extra)
+            else:
+                mat_bm_new = mat_bm.equiv(l_new = l_new, u_new = u_new,
+                                          transposed_new = transposed_new,
+                                          zero_extra = zero_extra)
+                assert mat_bm_new.l == l_new_value
+                assert mat_bm_new.u == u_new_value
+                assert mat_bm_new.transposed == transposed_new_value
+                assert_allequal(mat_bm_new.full(), mat_bm.full())
+                if zero_extra:
+                    mat_new_data_good = (
+                        fl.band_e(u_new_value, l_new_value, mat_bm.full().T)
+                    ) if mat_bm_new.transposed else (
+                        fl.band_e(l_new_value, u_new_value, mat_bm.full())
+                    )
+                    assert_allequal(mat_bm_new.data, mat_new_data_good)
 
     def test_zeros(self, its = 50):
         for it in range(its):

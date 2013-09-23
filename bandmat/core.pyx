@@ -108,22 +108,48 @@ class BandMat(object):
         else:
             return BandMat(l, u, self.data.copy())
 
-    # (FIXME : useful? Remove?)
-    def canonicalized(self):
-        """Returns an equivalent BandMat with transposed set to False.
+    def equiv(self, l_new = None, u_new = None, transposed_new = None,
+              zero_extra = False):
+        """Returns an equivalent BandMat stored differently.
 
-        The returned BandMat represents the same matrix as `self`, but always
-        has `transposed` set to False.
-        If `self.transposed` is True then the returned BandMat has a
-        newly-created underlying data array, and otherwise the returned BandMat
-        has the same underlying data array as `self`.
+        The returned BandMat represents the same matrix as `self`, but has a
+        newly-created underlying data array, and has possibly different
+        parameters `l`, `u` and `transposed`.
+        The new values of these parameters are given by `l_new`, `u_new` and
+        `transposed_new`, with the corresponding value from `self` used if any
+        of these are None.
+
+        If `zero_extra` is True then the underlying data array of the returned
+        BandMat is guaranteed to have extra entries set to zero.
         """
         l = self.l
         u = self.u
-        if self.transposed:
-            return BandMat(l, u, fl.band_cTe(u, l, self.data))
+        if l_new is None:
+            l_new = l
+        if u_new is None:
+            u_new = u
+        if transposed_new is None:
+            transposed_new = self.transposed
+
+        assert l_new >= l
+        assert u_new >= u
+
+        data_new = np.empty((l_new + u_new + 1, self.size))
+
+        ll, uu = (u, l) if transposed_new else (l, u)
+        ll_new, uu_new = (u_new, l_new) if transposed_new else (l_new, u_new)
+
+        data_new[(uu_new - uu_new):(uu_new - uu)] = 0.0
+        data_new[(uu_new + ll + 1):(uu_new + ll_new + 1)] = 0.0
+        data_new_co = data_new[(uu_new - uu):(uu_new + ll + 1)]
+        if self.transposed == transposed_new:
+            data_new_co[:] = self.data
+            if zero_extra:
+                fl.zero_extra_entries(ll, uu, data_new_co)
         else:
-            return BandMat(l, u, self.data)
+            fl.band_cTe(uu, ll, self.data, target_rect = data_new_co)
+
+        return BandMat(l_new, u_new, data_new, transposed = transposed_new)
 
 def zeros(l, u, size):
     """Returns the zero matrix as a BandMat.
@@ -172,26 +198,11 @@ def band_e_bm(l, u, mat_bm):
 
     where `mat_full` is a square numpy array.
     """
-    l_in = mat_bm.l
-    u_in = mat_bm.u
-    l_co = min(l, l_in)
-    u_co = min(u, u_in)
-
-    mat_rect = np.empty((l + u + 1, mat_bm.size))
-    mat_rect[(u - u):(u - u_co)] = 0.0
-    mat_rect[(u + l_co + 1):(u + l + 1)] = 0.0
-
-    mat_rect_co = mat_rect[(u - u_co):(u + l_co + 1)]
-    if mat_bm.transposed:
-        slice_data = slice(l_in - l_co, l_in + u_co + 1)
-        fl.band_cTe(u_co, l_co, mat_bm.data[slice_data],
-                    target_rect = mat_rect_co)
-    else:
-        slice_data = slice(u_in - u_co, u_in + l_co + 1)
-        mat_rect_co[:] = mat_bm.data[slice_data]
-        fl.zero_extra_entries(l_co, u_co, mat_rect_co)
-
-    return mat_rect
+    mat_bm_co = band_ec_bm_view(l, u, mat_bm)
+    mat_bm_new = mat_bm_co.equiv(l_new = l, u_new = u,
+                                 transposed_new = False,
+                                 zero_extra = True)
+    return mat_bm_new.data
 
 band_ce_bm = fl.band_ce
 
