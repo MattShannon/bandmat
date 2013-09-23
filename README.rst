@@ -61,8 +61,8 @@ Alternatively you can download bandmat from PyPI and install it using::
 The latest development version of bandmat is available from a github repository
 (see below).
 
-Usage
------
+Examples
+--------
 
 The python script ``example.py`` contains some simple examples of how the
 bandmat package may be used.
