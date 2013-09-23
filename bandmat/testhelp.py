@@ -3,13 +3,26 @@
 import numpy as np
 from numpy.random import randn
 
-def assert_allclose(actual, desired, rtol = 1e-7, atol = 1e-14, msg = 'items not almost equal'):
-    if np.shape(actual) != np.shape(desired) or not np.allclose(actual, desired, rtol, atol):
-        raise AssertionError(msg+'\n ACTUAL:\n'+repr(actual)+'\n DESIRED:\n'+repr(desired))
+def assert_allclose(actual, desired, rtol = 1e-7, atol = 1e-14,
+                    msg = 'items not almost equal'):
+    if np.shape(actual) != np.shape(desired):
+        raise AssertionError('%s (wrong shape)\n ACTUAL:  %r\n DESIRED: %r' %
+                             (msg, actual, desired))
+    if not np.allclose(actual, desired, rtol, atol):
+        absErr = np.abs(actual - desired)
+        relErr = np.abs((actual - desired) / desired)
+        raise AssertionError('%s\n ACTUAL:  %r\n DESIRED: %r\n'
+                             ' ABS ERR: %r (max %s)\n REL ERR: %r (max %s)' %
+                             (msg, actual, desired,
+                              absErr, np.max(absErr), relErr, np.max(relErr)))
 
 def assert_allequal(actual, desired, msg = 'items not equal'):
-    if np.shape(actual) != np.shape(desired) or not np.all(actual == desired):
-        raise AssertionError(msg+'\n ACTUAL:\n'+repr(actual)+'\n DESIRED:\n'+repr(desired))
+    if np.shape(actual) != np.shape(desired):
+        raise AssertionError('%s (wrong shape)\n ACTUAL:  %r\n DESIRED: %r' %
+                             (msg, actual, desired))
+    if not np.all(actual == desired):
+        raise AssertionError('%s\n ACTUAL:  %r\n DESIRED: %r' %
+                             (msg, actual, desired))
 
 def randomize_extra_entries(l, u, mat_rect):
     """Randomizes the extra entries of a rectangular matrix.
