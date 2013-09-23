@@ -11,6 +11,7 @@ import bandmat as bm
 import bandmat.full as fl
 
 import unittest
+import doctest
 import numpy as np
 import random
 from numpy.random import randn, randint
@@ -28,6 +29,11 @@ def gen_BandMat(size, l = None, u = None, transposed = None):
     if transposed is None:
         transposed = randBool()
     return bm.BandMat(l, u, data, transposed = transposed)
+
+# package-level docstring tests (N.B. includes other modules, not just core)
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite(bm))
+    return tests
 
 class TestCore(unittest.TestCase):
     def test_BandMat_basic(self, its = 50):
