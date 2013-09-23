@@ -6,4 +6,4 @@
 # See `License` for details of license and warranty.
 
 from bandmat.core import *
-from bandmat.core_fast import *
+from bandmat.tensor import *

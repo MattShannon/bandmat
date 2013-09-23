@@ -9,21 +9,22 @@ operations on banded matrices.
 Overview
 --------
 
+A banded matrix is a matrix where only the diagonal, a number of superdiagonals
+and a number of subdiagonals are non-zero.
 The well-known BLAS interface and LAPACK library for linear algebra define
 several banded matrix operations, and some of these, such as banded Cholesky
 decomposition, are wrapped in the excellent python package scipy, specifically
 in scipy.linalg.
 The bandmat package re-uses the banded matrix representation used by BLAS,
-LAPACK and scipy.linalg.
-This represents a square n by n banded matrix as a d by n numpy array together
-with the lower or sub-diagonal bandwidth l and the upper or super-diagonal
-bandwidth u, where the overall bandwidth d is equal to l + u + 1.
-Only square banded matrices are supported by this package.
-Full details of the banded representation can be found in the docstring for
-scipy.linalg.solve_banded.
+LAPACK and scipy.linalg, wrapping it in a lightweight class for ease of use.
+See the docstring for the `BandMat` class for full details of the
+representation used.
 
 The bandmat package provides:
 
+- a lightweight class wrapping the LAPACK-style banded matrix representation.
+  This class keeps track of things like bandwidths to allow a more direct
+  coding style when working with banded matrices.
 - some basic banded matrix operations not present in scipy.
   For example, banded matrix-vector multiplication is defined by BLAS but not
   wrapped by scipy, and banded matrix-matrix multiplication is not defined in
@@ -33,11 +34,11 @@ The bandmat package provides:
 - helper functions for converting between full and banded matrix
   representations.
 - certain linear algebra operations on banded matrices.
-  Currently the only supported operation is finding the band of the inverse of
-  a positive definite banded matrix.
 - an implementation of a fancy indexed += function for numpy arrays.
-  This is included for (the author's) convenience and is not specific to banded
-  matrices.
+  This is included for (the author's) convenience and is not directly related
+  to banded matrix manipulation.
+
+Only square banded matrices are supported by this package.
 
 License
 -------

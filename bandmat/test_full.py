@@ -1,4 +1,4 @@
-"""Tests for banded operations on full matrices."""
+"""Tests for operations involving the bands of square matrices."""
 
 # Copyright 2013 Matt Shannon
 
@@ -7,7 +7,7 @@
 
 from bandmat.testhelp import assert_allclose, assert_allequal
 
-from bandmat import full as fl
+import bandmat.full as fl
 
 import unittest
 import numpy as np
@@ -120,7 +120,7 @@ class TestFull(unittest.TestCase):
 
             mat_rect_good[:] = fl.band_e(l, u, fl.band_c(l, u, mat_rect_good))
 
-            assert_allclose(mat_rect, mat_rect_good)
+            assert_allequal(mat_rect, mat_rect_good)
 
     def test_band_ce(self, its = 100):
         """Checks band_ce against its definition and required properties."""
@@ -133,13 +133,13 @@ class TestFull(unittest.TestCase):
             mat_rect_new = fl.band_ce(l, u, mat_rect)
 
             # check definition
-            assert_allclose(
+            assert_allequal(
                 mat_rect_new,
                 fl.band_e(l, u, fl.band_c(l, u, mat_rect))
             )
 
             # check idempotent
-            assert_allclose(
+            assert_allequal(
                 fl.band_ce(l, u, mat_rect_new),
                 mat_rect_new
             )
@@ -155,16 +155,44 @@ class TestFull(unittest.TestCase):
             mat_full_new = fl.band_ec(l, u, mat_full)
 
             # check definition
-            assert_allclose(
+            assert_allequal(
                 mat_full_new,
                 fl.band_c(l, u, fl.band_e(l, u, mat_full))
             )
 
             # check idempotent
-            assert_allclose(
+            assert_allequal(
                 fl.band_ec(l, u, mat_full_new),
                 mat_full_new
             )
+
+    def test_band_cTe(self, its = 100):
+        """Checks band_cTe against its definition and required properties."""
+        for it in range(its):
+            l = random.choice([0, 1, randint(0, 10)])
+            u = random.choice([0, 1, randint(0, 10)])
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            mat_rect = randn(l + u + 1, size)
+
+            mat_rect_new = fl.band_cTe(l, u, mat_rect)
+
+            # check definition
+            assert_allequal(
+                mat_rect_new,
+                fl.band_e(u, l, fl.band_c(l, u, mat_rect).T)
+            )
+
+            # check a property to do with doing band_cTe twice
+            assert_allequal(
+                fl.band_cTe(u, l, mat_rect_new),
+                fl.band_ce(l, u, mat_rect)
+            )
+
+            # check version that uses pre-specified target
+            mat_rect_new2 = np.empty((l + u + 1, size))
+            ret = fl.band_cTe(l, u, mat_rect, target_rect = mat_rect_new2)
+            self.assertIsNone(ret)
+            assert_allequal(mat_rect_new2, mat_rect_new)
 
 if __name__ == '__main__':
     unittest.main()

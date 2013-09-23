@@ -13,7 +13,10 @@ from distutils.command.sdist import sdist as _sdist
 
 cython_locs = [
     ('bandmat', 'full'),
-    ('bandmat', 'core_fast'),
+    ('bandmat', 'core'),
+    ('bandmat', 'tensor'),
+    ('bandmat', 'linalg'),
+    ('bandmat', 'misc'),
 ]
 
 with open('README.rst') as readmeFile:
