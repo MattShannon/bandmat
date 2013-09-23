@@ -39,6 +39,12 @@ The bandmat package provides:
   This is included for (the author's) convenience and is not specific to banded
   matrices.
 
+License
+-------
+
+Please see the file ``License`` for details of the license and warranty for
+bandmat.
+
 Installation
 ------------
 
@@ -63,12 +69,6 @@ bandmat package may be used.
 To run it::
 
     python example.py
-
-License
--------
-
-Please see the file ``License`` for details of the license and warranty for
-bandmat.
 
 Development
 -----------
