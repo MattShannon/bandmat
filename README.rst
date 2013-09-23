@@ -17,8 +17,8 @@ decomposition, are wrapped in the excellent python package scipy, specifically
 in scipy.linalg.
 The bandmat package re-uses the banded matrix representation used by BLAS,
 LAPACK and scipy.linalg, wrapping it in a lightweight class for ease of use.
-See the docstring for the `BandMat` class for full details of the
-representation used.
+See the docstring for the BandMat class for full details of the representation
+used.
 
 The bandmat package provides:
 
