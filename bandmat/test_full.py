@@ -15,29 +15,6 @@ import random
 from numpy.random import randn, randint
 
 class TestFull(unittest.TestCase):
-    def test_band_e_basis(self, its = 100):
-        """Checks band_e behaves correctly on canonical basis matrices."""
-        for it in range(its):
-            l = random.choice([0, 1, randint(0, 10)])
-            u = random.choice([0, 1, randint(0, 10)])
-            # size >= 1 (there are no canonical basis matrices if size == 0)
-            size = random.choice([1, 2, randint(1, 10), randint(1, 100)])
-
-            # pick a random canonical basis matrix
-            k = randint(size)
-            j = randint(size)
-            mat_full = np.zeros((size, size))
-            mat_full[k, j] = 1.0
-
-            mat_rect = fl.band_e(l, u, mat_full)
-
-            i = k - j
-            mat_rect_good = np.zeros((l + u + 1, size))
-            if -u <= i <= l:
-                mat_rect_good[u + i, j] = 1.0
-
-            assert_allequal(mat_rect, mat_rect_good)
-
     def test_band_c_basis(self, its = 100):
         """Checks band_c behaves correctly on canonical basis matrices."""
         for it in range(its):
@@ -61,29 +38,6 @@ class TestFull(unittest.TestCase):
 
             assert_allequal(mat_full, mat_full_good)
 
-    def test_band_e_linear(self, its = 100):
-        """Checks band_e is linear."""
-        for it in range(its):
-            l = random.choice([0, 1, randint(0, 10)])
-            u = random.choice([0, 1, randint(0, 10)])
-            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
-
-            # check additive
-            mat_full1 = randn(size, size)
-            mat_full2 = randn(size, size)
-            assert_allclose(
-                fl.band_e(l, u, mat_full1 + mat_full2),
-                fl.band_e(l, u, mat_full1) + fl.band_e(l, u, mat_full2)
-            )
-
-            # check homogeneous
-            mat_full = randn(size, size)
-            mult = random.choice([0.0, randn(), randn(), randn()])
-            assert_allclose(
-                fl.band_e(l, u, mat_full * mult),
-                fl.band_e(l, u, mat_full) * mult
-            )
-
     def test_band_c_linear(self, its = 100):
         """Checks band_c is linear."""
         for it in range(its):
@@ -105,6 +59,52 @@ class TestFull(unittest.TestCase):
             assert_allclose(
                 fl.band_c(l, u, mat_rect * mult),
                 fl.band_c(l, u, mat_rect) * mult
+            )
+
+    def test_band_e_basis(self, its = 100):
+        """Checks band_e behaves correctly on canonical basis matrices."""
+        for it in range(its):
+            l = random.choice([0, 1, randint(0, 10)])
+            u = random.choice([0, 1, randint(0, 10)])
+            # size >= 1 (there are no canonical basis matrices if size == 0)
+            size = random.choice([1, 2, randint(1, 10), randint(1, 100)])
+
+            # pick a random canonical basis matrix
+            k = randint(size)
+            j = randint(size)
+            mat_full = np.zeros((size, size))
+            mat_full[k, j] = 1.0
+
+            mat_rect = fl.band_e(l, u, mat_full)
+
+            i = k - j
+            mat_rect_good = np.zeros((l + u + 1, size))
+            if -u <= i <= l:
+                mat_rect_good[u + i, j] = 1.0
+
+            assert_allequal(mat_rect, mat_rect_good)
+
+    def test_band_e_linear(self, its = 100):
+        """Checks band_e is linear."""
+        for it in range(its):
+            l = random.choice([0, 1, randint(0, 10)])
+            u = random.choice([0, 1, randint(0, 10)])
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+
+            # check additive
+            mat_full1 = randn(size, size)
+            mat_full2 = randn(size, size)
+            assert_allclose(
+                fl.band_e(l, u, mat_full1 + mat_full2),
+                fl.band_e(l, u, mat_full1) + fl.band_e(l, u, mat_full2)
+            )
+
+            # check homogeneous
+            mat_full = randn(size, size)
+            mult = random.choice([0.0, randn(), randn(), randn()])
+            assert_allclose(
+                fl.band_e(l, u, mat_full * mult),
+                fl.band_e(l, u, mat_full) * mult
             )
 
     def test_zero_extra_entries(self, its = 100):

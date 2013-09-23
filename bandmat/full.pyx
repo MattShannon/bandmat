@@ -22,6 +22,39 @@ cnp.import_array()
 cnp.import_ufunc()
 
 @cython.boundscheck(False)
+def band_c(long l, long u, cnp.ndarray[cnp.float64_t, ndim=2] mat_rect):
+    """Constructs a full, square, banded matrix from its band.
+
+    Given a rectangular numpy matrix `mat_rect`, returns a square numpy matrix
+    `mat_full` with its `u` superdiagonals, diagonal and `l` subdiagonals given
+    given by the rows of `mat_rect`.
+    The part of each column of `mat_full` that lies within the band contains
+    the same entries as the corresponding column of `mat_rect`.
+    The extra entries in the corners of `mat_rect` which do not correspond to
+    any entry in `mat_full` are ignored.
+    """
+    assert l >= 0
+    assert u >= 0
+    assert mat_rect.shape[0] == l + u + 1
+
+    cdef long size
+    cdef cnp.ndarray[cnp.float64_t, ndim=2] mat_full
+
+    size = mat_rect.shape[1]
+    mat_full = np.zeros((size, size))
+
+    cdef long i
+    cdef unsigned long row
+    cdef unsigned long j
+
+    for i in range(-u, l + 1):
+        row = u + i
+        for j in range(max(0, -i), max(0, size + min(0, -i))):
+            mat_full[j + i, j] = mat_rect[row, j]
+
+    return mat_full
+
+@cython.boundscheck(False)
 def band_e(long l, long u, cnp.ndarray[cnp.float64_t, ndim=2] mat_full):
     """Extracts the band of a full, square, banded matrix.
 
@@ -54,39 +87,6 @@ def band_e(long l, long u, cnp.ndarray[cnp.float64_t, ndim=2] mat_full):
             mat_rect[row, j] = mat_full[j + i, j]
 
     return mat_rect
-
-@cython.boundscheck(False)
-def band_c(long l, long u, cnp.ndarray[cnp.float64_t, ndim=2] mat_rect):
-    """Constructs a full, square, banded matrix from its band.
-
-    Given a rectangular numpy matrix `mat_rect`, returns a square numpy matrix
-    `mat_full` with its `u` superdiagonals, diagonal and `l` subdiagonals given
-    given by the rows of `mat_rect`.
-    The part of each column of `mat_full` that lies within the band contains
-    the same entries as the corresponding column of `mat_rect`.
-    The extra entries in the corners of `mat_rect` which do not correspond to
-    any entry in `mat_full` are ignored.
-    """
-    assert l >= 0
-    assert u >= 0
-    assert mat_rect.shape[0] == l + u + 1
-
-    cdef long size
-    cdef cnp.ndarray[cnp.float64_t, ndim=2] mat_full
-
-    size = mat_rect.shape[1]
-    mat_full = np.zeros((size, size))
-
-    cdef long i
-    cdef unsigned long row
-    cdef unsigned long j
-
-    for i in range(-u, l + 1):
-        row = u + i
-        for j in range(max(0, -i), max(0, size + min(0, -i))):
-            mat_full[j + i, j] = mat_rect[row, j]
-
-    return mat_full
 
 @cython.boundscheck(False)
 def zero_extra_entries(long l, long u,
