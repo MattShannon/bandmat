@@ -5,7 +5,7 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
-from bandmat.testhelp import assert_allclose, assert_allequal
+from bandmat.testhelp import assert_allclose, assert_allequal, get_array_mem
 
 from bandmat.misc import fancy_plus_equals, fancy_plus_equals_2d
 
@@ -27,6 +27,7 @@ class TestMisc(unittest.TestCase):
             targetIndexSeq = np.array([ randint(targetSize)
                                         for _ in range(sourceSize) ],
                                       dtype = np.int64)
+            array_mem = get_array_mem(targetIndexSeq, source, target)
 
             targetGood = target.copy()
             for sourceIndex, targetIndex in enumerate(targetIndexSeq):
@@ -35,6 +36,7 @@ class TestMisc(unittest.TestCase):
             fancy_plus_equals(targetIndexSeq, source, target)
 
             assert_allclose(target, targetGood)
+            assert get_array_mem(targetIndexSeq, source, target) == array_mem
 
     def test_fancy_plus_equals_fails(self, its = 100):
         for it in range(its):
@@ -63,6 +65,7 @@ class TestMisc(unittest.TestCase):
             targetIndexSeq = np.array([ randint(targetSize)
                                         for _ in range(sourceSize) ],
                                       dtype = np.int64)
+            array_mem = get_array_mem(targetIndexSeq, source, target)
 
             targetGood = target.copy()
             for sourceIndex, targetIndex in enumerate(targetIndexSeq):
@@ -71,6 +74,7 @@ class TestMisc(unittest.TestCase):
             fancy_plus_equals_2d(targetIndexSeq, source, target)
 
             assert_allclose(target, targetGood)
+            assert get_array_mem(targetIndexSeq, source, target) == array_mem
 
     def test_fancy_plus_equals_2d_fails(self, its = 100):
         for it in range(its):
