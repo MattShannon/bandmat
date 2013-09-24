@@ -227,6 +227,89 @@ class BandMat(object):
         c_bm.plus_equals_band_of(other)
         return c_bm
 
+    def __sub__(self, other):
+        """Subtracts one banded matrix from another.
+
+        The expression `a_bm - b_bm` where `a_bm` and `b_bm` are BandMats is
+        the equivalent of:
+
+            a_full - b_full
+
+        where `a_full` and `b_full` are square numpy arrays.
+        """
+        if not isinstance(other, BandMat):
+            return NotImplemented
+
+        assert self.size == other.size
+        c_bm = self.equiv(l_new = max(self.l, other.l),
+                          u_new = max(self.u, other.u))
+        c_bm.plus_equals_band_of(other, mult = -1.0)
+        return c_bm
+
+    def __iadd__(self, other):
+        """Adds another matrix to this matrix in-place.
+
+        The statement `a_bm += b_bm` where `a_bm` and `b_bm` are BandMats is
+        the equivalent of:
+
+            a_full += b_full
+
+        where `a_full` and `b_full` are square numpy arrays.
+        """
+        if not isinstance(other, BandMat):
+            return NotImplemented
+
+        assert self.size == other.size
+        assert self.l >= other.l
+        assert self.u >= other.u
+
+        self.plus_equals_band_of(other)
+        return self
+
+    def __isub__(self, other):
+        """Subtracts another matrix from this matrix in-place.
+
+        The statement `a_bm -= b_bm` where `a_bm` and `b_bm` are BandMats is
+        the equivalent of:
+
+            a_full -= b_full
+
+        where `a_full` and `b_full` are square numpy arrays.
+        """
+        if not isinstance(other, BandMat):
+            return NotImplemented
+
+        assert self.size == other.size
+        assert self.l >= other.l
+        assert self.u >= other.u
+
+        self.plus_equals_band_of(other, mult = -1.0)
+        return self
+
+    def __pos__(self):
+        """Take the positive of a banded matrix.
+
+        The expression `+a_bm` where `a_bm` is a BandMat is the equivalent of:
+
+            +a_full
+
+        where `a_full` is a square numpy array.
+        """
+        return BandMat(self.l, self.u, +self.data,
+                       transposed = self.transposed)
+
+    def __neg__(self):
+        """Take the negative of a banded matrix.
+
+        The expression `-a_bm` where `a_bm` is a BandMat is the equivalent of:
+
+            -a_full
+
+        where `a_full` is a square numpy array.
+        """
+        return BandMat(self.l, self.u, -self.data,
+                       transposed = self.transposed)
+
     def __mul__(self, other):
         """Multiplies a banded matrix by a scalar.
 
@@ -245,6 +328,65 @@ class BandMat(object):
         return BandMat(self.l, self.u, self.data * mult,
                        transposed = self.transposed)
 
+    def __rmul__(self, other):
+        return self.__mul__(other)
+
+    def __floordiv__(self, other):
+        """Floor-divides a banded matrix by a scalar.
+
+        The expression `a_bm // mult` where `a_bm` is a BandMat is the
+        equivalent of:
+
+            a_full // mult
+
+        where `a_full` is a square numpy array.
+        """
+        try:
+            mult = float(other)
+        except:
+            return NotImplemented
+
+        return BandMat(self.l, self.u, self.data.__floordiv__(mult),
+                       transposed = self.transposed)
+
+    def __div__(self, other):
+        """Old-style divides a banded matrix by a scalar.
+
+        When using old-style division (c.f. `from __future__ import division`),
+        the expression `a_bm / mult` where `a_bm` is a BandMat is the
+        equivalent of:
+
+            a_full / mult
+
+        where `a_full` is a square numpy array.
+        """
+        try:
+            mult = float(other)
+        except:
+            return NotImplemented
+
+        return BandMat(self.l, self.u, self.data.__div__(mult),
+                       transposed = self.transposed)
+
+    def __truediv__(self, other):
+        """Divides a banded matrix by a scalar.
+
+        When using new-style division (c.f. `from __future__ import division`),
+        the expression `a_bm / mult` where `a_bm` is a BandMat is the
+        equivalent of:
+
+            a_full / mult
+
+        where `a_full` is a square numpy array.
+        """
+        try:
+            mult = float(other)
+        except:
+            return NotImplemented
+
+        return BandMat(self.l, self.u, self.data.__truediv__(mult),
+                       transposed = self.transposed)
+
     def __imul__(self, other):
         """Multiplies this matrix by a scalar in-place.
 
@@ -261,6 +403,62 @@ class BandMat(object):
             return NotImplemented
 
         self.data *= mult
+        return self
+
+    def __ifloordiv__(self, other):
+        """Floor-divides this matrix by a scalar in-place.
+
+        The statement `a_bm //= mult` where `a_bm` is a BandMat is the
+        equivalent of:
+
+            a_full //= mult
+
+        where `a_full` is a square numpy array.
+        """
+        try:
+            mult = float(other)
+        except:
+            return NotImplemented
+
+        self.data.__ifloordiv__(mult)
+        return self
+
+    def __idiv__(self, other):
+        """Old-style divides this matrix by a scalar in-place.
+
+        When using old-style division (c.f. `from __future__ import division`),
+        the expression `a_bm /= mult` where `a_bm` is a BandMat is the
+        equivalent of:
+
+            a_full /= mult
+
+        where `a_full` is a square numpy array.
+        """
+        try:
+            mult = float(other)
+        except:
+            return NotImplemented
+
+        self.data.__itruediv__(mult)
+        return self
+
+    def __itruediv__(self, other):
+        """Divides this matrix by a scalar in-place.
+
+        When using new-style division (c.f. `from __future__ import division`),
+        the expression `a_bm /= mult` where `a_bm` is a BandMat is the
+        equivalent of:
+
+            a_full /= mult
+
+        where `a_full` is a square numpy array.
+        """
+        try:
+            mult = float(other)
+        except:
+            return NotImplemented
+
+        self.data.__itruediv__(mult)
         return self
 
 def zeros(l, u, size):

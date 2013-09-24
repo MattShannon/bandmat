@@ -170,7 +170,82 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(TypeError):
                 1.0 + a_bm
 
-    def test_BandMat_mul(self, its = 100):
+    def test_BandMat_sub(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            a_bm = gen_BandMat(size)
+            b_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+            b_full = b_bm.full()
+
+            c_bm = a_bm - b_bm
+            c_full = a_full - b_full
+            assert_allclose(c_bm.full(), c_full)
+
+            with self.assertRaises(TypeError):
+                a_bm - 1.0
+            with self.assertRaises(TypeError):
+                1.0 - a_bm
+
+    def test_BandMat_iadd(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            a_bm = gen_BandMat(size)
+            b_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+            b_full = b_bm.full()
+
+            if a_bm.l >= b_bm.l and a_bm.u >= b_bm.u:
+                a_bm += b_bm
+                a_full += b_full
+                assert_allclose(a_bm.full(), a_full)
+            else:
+                with self.assertRaises(AssertionError):
+                    a_bm += b_bm
+
+            with self.assertRaises(TypeError):
+                a_bm += 1.0
+
+    def test_BandMat_isub(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            a_bm = gen_BandMat(size)
+            b_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+            b_full = b_bm.full()
+
+            if a_bm.l >= b_bm.l and a_bm.u >= b_bm.u:
+                a_bm -= b_bm
+                a_full -= b_full
+                assert_allclose(a_bm.full(), a_full)
+            else:
+                with self.assertRaises(AssertionError):
+                    a_bm -= b_bm
+
+            with self.assertRaises(TypeError):
+                a_bm -= 1.0
+
+    def test_BandMat_pos(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            a_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+
+            b_bm = +a_bm
+            b_full = +a_full
+            assert_allclose(b_bm.full(), b_full)
+
+    def test_BandMat_neg(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            a_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+
+            b_bm = -a_bm
+            b_full = -a_full
+            assert_allclose(b_bm.full(), b_full)
+
+    def test_BandMat_mul_and_rmul(self, its = 100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mult = randn()
@@ -183,8 +258,60 @@ class TestCore(unittest.TestCase):
             assert b_bm.u == a_bm.u
             assert_allclose(b_bm.full(), b_full)
 
+            c_bm = mult * a_bm
+            c_full = mult * a_full
+            assert c_bm.l == a_bm.l
+            assert c_bm.u == a_bm.u
+            assert_allclose(c_bm.full(), c_full)
+
             with self.assertRaises(TypeError):
                 a_bm * a_bm
+
+    def test_BandMat_various_divs(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            mult = randn()
+            a_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+
+            b_bm = a_bm // mult
+            b_full = a_full // mult
+            assert b_bm.l == a_bm.l
+            assert b_bm.u == a_bm.u
+            assert_allclose(b_bm.full(), b_full)
+
+            b_bm = a_bm / mult
+            b_full = a_full / mult
+            assert b_bm.l == a_bm.l
+            assert b_bm.u == a_bm.u
+            assert_allclose(b_bm.full(), b_full)
+
+            b_bm = a_bm.__floordiv__(mult)
+            b_full = a_full.__floordiv__(mult)
+            assert b_bm.l == a_bm.l
+            assert b_bm.u == a_bm.u
+            assert_allclose(b_bm.full(), b_full)
+
+            b_bm = a_bm.__div__(mult)
+            b_full = a_full.__div__(mult)
+            assert b_bm.l == a_bm.l
+            assert b_bm.u == a_bm.u
+            assert_allclose(b_bm.full(), b_full)
+
+            b_bm = a_bm.__truediv__(mult)
+            b_full = a_full.__truediv__(mult)
+            assert b_bm.l == a_bm.l
+            assert b_bm.u == a_bm.u
+            assert_allclose(b_bm.full(), b_full)
+
+            with self.assertRaises(TypeError):
+                a_bm // a_bm
+            with self.assertRaises(TypeError):
+                a_bm / a_bm
+            with self.assertRaises(TypeError):
+                1.0 // a_bm
+            with self.assertRaises(TypeError):
+                1.0 / a_bm
 
     def test_BandMat_imul(self, its = 100):
         for it in range(its):
@@ -199,6 +326,46 @@ class TestCore(unittest.TestCase):
 
             with self.assertRaises(TypeError):
                 a_bm *= a_bm
+
+    def test_BandMat_various_idivs(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            mult = randn()
+
+            a_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+            a_bm //= mult
+            a_full //= mult
+            assert_allclose(a_bm.full(), a_full)
+
+            a_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+            a_bm /= mult
+            a_full /= mult
+            assert_allclose(a_bm.full(), a_full)
+
+            a_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+            a_bm.__ifloordiv__(mult)
+            a_full.__ifloordiv__(mult)
+            assert_allclose(a_bm.full(), a_full)
+
+            a_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+            a_bm.__idiv__(mult)
+            a_full.__idiv__(mult)
+            assert_allclose(a_bm.full(), a_full)
+
+            a_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+            a_bm.__itruediv__(mult)
+            a_full.__itruediv__(mult)
+            assert_allclose(a_bm.full(), a_full)
+
+            with self.assertRaises(TypeError):
+                a_bm //= a_bm
+            with self.assertRaises(TypeError):
+                a_bm /= a_bm
 
     def test_zeros(self, its = 50):
         for it in range(its):
