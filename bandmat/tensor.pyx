@@ -289,3 +289,18 @@ def band_of_outer_plus_equals(cnp.ndarray[cnp.float64_t, ndim=1] a_vec,
             )
 
     return
+
+def trace_dot(a_bm, b_bm):
+    """Convenience method to compute the matrix inner product.
+
+    The expression `trace_dot(a_bm, b_bm)` where `a_bm` and `b_bm` are BandMats
+    is the equivalent of:
+
+        np.trace(np.dot(a_full.T, b_full))
+
+    where `a_full` and `b_full` are square numpy arrays.
+
+    This operation is a valid inner product over the vector space of square
+    matrices of a given size.
+    """
+    return np.sum(bm_core.diag(dot_mm_partial(0, 0, a_bm.T, b_bm)))

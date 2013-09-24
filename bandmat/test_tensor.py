@@ -161,5 +161,17 @@ class TestTensor(unittest.TestCase):
             assert_allclose(mat_bm.full(), mat_full)
             assert get_array_mem(a_vec, b_vec, mat_bm.data) == array_mem
 
+    def test_trace_dot(self, its = 50):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            a_bm = gen_BandMat(size)
+            b_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+            b_full = b_bm.full()
+
+            c = bm.trace_dot(a_bm, b_bm)
+            c_good = np.trace(np.dot(a_full.T, b_full))
+            assert_allclose(c, c_good)
+
 if __name__ == '__main__':
     unittest.main()
