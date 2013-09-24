@@ -5,7 +5,7 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
-from bandmat.testhelp import assert_allclose
+from bandmat.testhelp import assert_allclose, get_array_mem
 from bandmat.test_core import gen_BandMat
 
 import bandmat as bm
@@ -28,16 +28,12 @@ class TestTensor(unittest.TestCase):
             c = randn(size)
             a_full = a_bm.full()
             c_good = c.copy()
-            a_bm_data_id = id(a_bm.data)
-            b_id = id(b)
-            c_id = id(c)
+            array_mem = get_array_mem(a_bm.data, b, c)
 
             bm.dot_mv_plus_equals(a_bm, b, c)
             c_good += np.dot(a_full, b)
             assert_allclose(c, c_good)
-            assert id(a_bm.data) == a_bm_data_id
-            assert id(b) == b_id
-            assert id(c) == c_id
+            assert get_array_mem(a_bm.data, b, c) == array_mem
 
     def test_dot_mv(self, its = 100):
         for it in range(its):
@@ -65,10 +61,9 @@ class TestTensor(unittest.TestCase):
             c_full = c_bm.full()
             l = c_bm.l
             u = c_bm.u
-            a_bm_data_id = id(a_bm.data)
-            b_bm_data_id = id(b_bm.data)
-            c_bm_data_id = id(c_bm.data)
-            diag_id = id(diag)
+            array_mem = get_array_mem(a_bm.data, b_bm.data, c_bm.data)
+            if diag is not None:
+                diag_mem = get_array_mem(diag)
 
             bm.dot_mm_plus_equals(a_bm, b_bm, c_bm, diag = diag)
             c_full += fl.band_ec(
@@ -76,10 +71,9 @@ class TestTensor(unittest.TestCase):
                 np.dot(np.dot(a_full, np.diag(diag_value)), b_full)
             )
             assert_allclose(c_bm.full(), c_full)
-            assert id(a_bm.data) == a_bm_data_id
-            assert id(b_bm.data) == b_bm_data_id
-            assert id(c_bm.data) == c_bm_data_id
-            assert id(diag) == diag_id
+            assert get_array_mem(a_bm.data, b_bm.data, c_bm.data) == array_mem
+            if diag is not None:
+                assert get_array_mem(diag) == diag_mem
 
     def test_dot_mm(self, its = 50):
         for it in range(its):
@@ -160,16 +154,12 @@ class TestTensor(unittest.TestCase):
             mat_full = mat_bm.full()
             l = mat_bm.l
             u = mat_bm.u
-            mat_bm_data_id = id(mat_bm.data)
-            a_vec_id = id(a_vec)
-            b_vec_id = id(b_vec)
+            array_mem = get_array_mem(a_vec, b_vec, mat_bm.data)
 
             bm.band_of_outer_plus_equals(a_vec, b_vec, mat_bm, mult = mult)
             mat_full += fl.band_ec(l, u, np.outer(a_vec, b_vec) * mult)
             assert_allclose(mat_bm.full(), mat_full)
-            assert id(mat_bm.data) == mat_bm_data_id
-            assert id(a_vec) == a_vec_id
-            assert id(b_vec) == b_vec_id
+            assert get_array_mem(a_vec, b_vec, mat_bm.data) == array_mem
 
 if __name__ == '__main__':
     unittest.main()

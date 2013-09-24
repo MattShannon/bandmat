@@ -5,7 +5,7 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
-from bandmat.testhelp import assert_allclose, assert_allequal
+from bandmat.testhelp import assert_allclose, assert_allequal, get_array_mem
 
 import bandmat.full as fl
 
@@ -123,12 +123,12 @@ class TestFull(unittest.TestCase):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mat_rect = randn(l + u + 1, size)
             mat_rect_good = mat_rect.copy()
-            mat_rect_id = id(mat_rect)
+            array_mem = get_array_mem(mat_rect)
 
             fl.zero_extra_entries(l, u, mat_rect)
             mat_rect_good[:] = fl.band_e(l, u, fl.band_c(l, u, mat_rect_good))
             assert_allequal(mat_rect, mat_rect_good)
-            assert id(mat_rect) == mat_rect_id
+            assert get_array_mem(mat_rect) == array_mem
 
     def test_band_ce(self, its = 100):
         """Checks band_ce against its definition and required properties."""
@@ -189,13 +189,11 @@ class TestFull(unittest.TestCase):
 
             # check version that uses pre-specified target
             mat_rect_new2 = np.empty((l + u + 1, size))
-            mat_rect_id = id(mat_rect)
-            mat_rect_new2_id = id(mat_rect_new2)
+            array_mem = get_array_mem(mat_rect, mat_rect_new2)
             ret = fl.band_cTe(l, u, mat_rect, target_rect = mat_rect_new2)
             self.assertIsNone(ret)
             assert_allequal(mat_rect_new2, mat_rect_new)
-            assert id(mat_rect) == mat_rect_id
-            assert id(mat_rect_new2) == mat_rect_new2_id
+            assert get_array_mem(mat_rect, mat_rect_new2) == array_mem
 
 if __name__ == '__main__':
     unittest.main()

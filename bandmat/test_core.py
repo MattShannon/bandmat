@@ -5,7 +5,7 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
-from bandmat.testhelp import assert_allclose, assert_allequal
+from bandmat.testhelp import assert_allclose, assert_allequal, get_array_mem
 
 import bandmat as bm
 import bandmat.full as fl
@@ -161,17 +161,14 @@ class TestCore(unittest.TestCase):
             mat_bm = gen_BandMat(size)
             target_full = target_bm.full()
             mat_full = mat_bm.full()
-            target_bm_data_id = id(target_bm.data)
-            mat_bm_data_id = id(mat_bm.data)
+            array_mem = get_array_mem(target_bm.data, mat_bm.data)
 
             target_bm.plus_equals_band_of(mat_bm, mult)
             target_full += (
                 fl.band_ec(target_bm.l, target_bm.u, mat_full) * mult
             )
             assert_allclose(target_bm.full(), target_full)
-
-            assert id(target_bm.data) == target_bm_data_id
-            assert id(mat_bm.data) == mat_bm_data_id
+            assert get_array_mem(target_bm.data, mat_bm.data) == array_mem
 
     def test_BandMat_add(self, its = 100):
         for it in range(its):
@@ -218,16 +215,13 @@ class TestCore(unittest.TestCase):
             b_bm = gen_BandMat(size)
             a_full = a_bm.full()
             b_full = b_bm.full()
-            a_bm_data_id = id(a_bm.data)
-            b_bm_data_id = id(b_bm.data)
+            array_mem = get_array_mem(a_bm.data, b_bm.data)
 
             if a_bm.l >= b_bm.l and a_bm.u >= b_bm.u:
                 a_bm += b_bm
                 a_full += b_full
                 assert_allclose(a_bm.full(), a_full)
-
-                assert id(a_bm.data) == a_bm_data_id
-                assert id(b_bm.data) == b_bm_data_id
+                assert get_array_mem(a_bm.data, b_bm.data) == array_mem
             else:
                 with self.assertRaises(AssertionError):
                     a_bm += b_bm
@@ -242,16 +236,13 @@ class TestCore(unittest.TestCase):
             b_bm = gen_BandMat(size)
             a_full = a_bm.full()
             b_full = b_bm.full()
-            a_bm_data_id = id(a_bm.data)
-            b_bm_data_id = id(b_bm.data)
+            array_mem = get_array_mem(a_bm.data, b_bm.data)
 
             if a_bm.l >= b_bm.l and a_bm.u >= b_bm.u:
                 a_bm -= b_bm
                 a_full -= b_full
                 assert_allclose(a_bm.full(), a_full)
-
-                assert id(a_bm.data) == a_bm_data_id
-                assert id(b_bm.data) == b_bm_data_id
+                assert get_array_mem(a_bm.data, b_bm.data) == array_mem
             else:
                 with self.assertRaises(AssertionError):
                     a_bm -= b_bm
@@ -362,13 +353,12 @@ class TestCore(unittest.TestCase):
             mult = randn()
             a_bm = gen_BandMat(size)
             a_full = a_bm.full()
-            a_bm_data_id = id(a_bm.data)
+            array_mem = get_array_mem(a_bm.data)
 
             a_bm *= mult
             a_full *= mult
             assert_allclose(a_bm.full(), a_full)
-
-            assert id(a_bm.data) == a_bm_data_id
+            assert get_array_mem(a_bm.data) == array_mem
 
             with self.assertRaises(TypeError):
                 a_bm *= a_bm
@@ -380,43 +370,43 @@ class TestCore(unittest.TestCase):
 
             a_bm = gen_BandMat(size)
             a_full = a_bm.full()
-            a_bm_data_id = id(a_bm.data)
+            array_mem = get_array_mem(a_bm.data)
             a_bm //= mult
             a_full //= mult
             assert_allclose(a_bm.full(), a_full)
-            assert id(a_bm.data) == a_bm_data_id
+            assert get_array_mem(a_bm.data) == array_mem
 
             a_bm = gen_BandMat(size)
             a_full = a_bm.full()
-            a_bm_data_id = id(a_bm.data)
+            array_mem = get_array_mem(a_bm.data)
             a_bm /= mult
             a_full /= mult
             assert_allclose(a_bm.full(), a_full)
-            assert id(a_bm.data) == a_bm_data_id
+            assert get_array_mem(a_bm.data) == array_mem
 
             a_bm = gen_BandMat(size)
             a_full = a_bm.full()
-            a_bm_data_id = id(a_bm.data)
+            array_mem = get_array_mem(a_bm.data)
             a_bm.__ifloordiv__(mult)
             a_full.__ifloordiv__(mult)
             assert_allclose(a_bm.full(), a_full)
-            assert id(a_bm.data) == a_bm_data_id
+            assert get_array_mem(a_bm.data) == array_mem
 
             a_bm = gen_BandMat(size)
             a_full = a_bm.full()
-            a_bm_data_id = id(a_bm.data)
+            array_mem = get_array_mem(a_bm.data)
             a_bm.__idiv__(mult)
             a_full.__idiv__(mult)
             assert_allclose(a_bm.full(), a_full)
-            assert id(a_bm.data) == a_bm_data_id
+            assert get_array_mem(a_bm.data) == array_mem
 
             a_bm = gen_BandMat(size)
             a_full = a_bm.full()
-            a_bm_data_id = id(a_bm.data)
+            array_mem = get_array_mem(a_bm.data)
             a_bm.__itruediv__(mult)
             a_full.__itruediv__(mult)
             assert_allclose(a_bm.full(), a_full)
-            assert id(a_bm.data) == a_bm_data_id
+            assert get_array_mem(a_bm.data) == array_mem
 
             with self.assertRaises(TypeError):
                 a_bm //= a_bm
