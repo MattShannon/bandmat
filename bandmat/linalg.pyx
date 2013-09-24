@@ -1,4 +1,16 @@
-"""Linear algebra operations for banded matrices."""
+"""Linear algebra operations for banded matrices.
+
+Several of the functions in this module deal with symmetric banded matrices.
+Symmetric banded matrices can in principle be stored even more efficiently than
+general banded matrices, by not storing the superdiagonals (or subdiagonals).
+However in bandmat the simpler, more explicit representation which stores the
+whole band is used instead.
+This is slightly less efficient in terms of memory and time, but results in a
+more unified interface and simpler code in the author's limited experience.
+Note that this is in line with the convention used by numpy and scipy for
+symmetric "full" (i.e. non-banded) matrices, where both the upper and lower
+triangles are represented in memory.
+"""
 
 # Copyright 2013 Matt Shannon
 
