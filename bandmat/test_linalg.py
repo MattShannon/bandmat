@@ -28,7 +28,6 @@ def gen_symmetric_BandMat(size, depth = None):
     a_bm = gen_BandMat(size, l = depth, u = depth)
     b_bm = a_bm + a_bm.T
     randomize_extra_entries_bm(b_bm)
-    print 'transposed =', b_bm.transposed
     return b_bm
 
 def gen_pos_def_BandMat(size, depth = None, contribRank = 2):
