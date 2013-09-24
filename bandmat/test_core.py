@@ -442,5 +442,18 @@ class TestCore(unittest.TestCase):
             b_full_good = fl.band_ec(l, u, a_bm.full())
             assert_allequal(b_bm.full(), b_full_good)
 
+    def test_diag(self, its = 50):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+
+            vec = randn(size)
+            mat_bm = bm.diag(vec)
+            assert isinstance(mat_bm, bm.BandMat)
+            assert_allequal(mat_bm.full(), np.diag(vec))
+
+            mat_bm = gen_BandMat(size)
+            vec = bm.diag(mat_bm)
+            assert_allequal(vec, np.diag(mat_bm.full()))
+
 if __name__ == '__main__':
     unittest.main()

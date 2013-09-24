@@ -558,3 +558,30 @@ def band_ec_bm(l, u, mat_bm):
     where `mat_full` and the returned value are square numpy arrays.
     """
     return band_ec_bm_view(l, u, mat_bm).copy_exact()
+
+def diag(vec_or_mat_bm):
+    """Constructs a diagonal BandMat or extracts the diagonal from a BandMat.
+
+    If `vec_or_mat_bm` is a vector `vec` (i.e. a one-dimensional numpy array),
+    then this function returns a BandMat representing the diagonal matrix with
+    diagonal `vec`.
+    If `vec_or_mat_bm` is a BandMat `mat_bm`, then this function returns the
+    vector consisting of the diagonal of the matrix represented by `mat_bm`.
+    In both cases the array storing the vector and the BandMat's underlying
+    data array share memory.
+
+    The expression `diag(vec_or_mat_bm)` where `vec_or_mat_bm` is a vector or a
+    BandMat is the equivalent of:
+
+        np.diag(vec_or_mat_full)
+
+    where `vec_or_mat_full` is a vector or a square numpy array.
+    """
+    if not isinstance(vec_or_mat_bm, BandMat):
+        vec = vec_or_mat_bm
+        assert vec.ndim == 1
+        return BandMat(0, 0, np.reshape(vec, (1, -1)))
+    else:
+        mat_bm = vec_or_mat_bm
+        row = mat_bm.l if mat_bm.transposed else mat_bm.u
+        return mat_bm.data[row]
