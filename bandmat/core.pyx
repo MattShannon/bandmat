@@ -152,18 +152,18 @@ class BandMat(object):
         return BandMat(l_new, u_new, data_new, transposed = transposed_new)
 
     @cython.boundscheck(False)
-    def plus_equals_band_of(self, mat_bm):
-        """Adds a band of another matrix to this matrix in-place.
+    def plus_equals_band_of(self, mat_bm, double mult = 1.0):
+        """Adds a multiple of a band of another matrix to this matrix in-place.
 
         Any entries of `mat_bm` which lie outside of `self` are ignored.
         Thus to implement conventional matrix addition, `self` must be large
         enough to contain the result of the addition, i.e. `self` must have at
         least as many subdiagonals and superdiagonals as `mat_bm`.
 
-        The statement `target_bm.plus_equals_band_of(mat_bm)` where `target_bm`
-        and `mat_bm` are BandMats is the equivalent of:
+        The statement `target_bm.plus_equals_band_of(mat_bm, mult)` where
+        `target_bm` and `mat_bm` are BandMats is the equivalent of:
 
-            target_full += band_ec(l, u, mat_full)
+            target_full += band_ec(l, u, mat_full) * mult
 
         where `target_full` and `mat_full` are square numpy arrays.
         Here `l` is `target_bm.l` and `u` is `target_bm.u`.
@@ -204,7 +204,7 @@ class BandMat(object):
             d_a = o if transposed_a else 0
             d_b = o if transposed_b else 0
             for frame in range(max(0, -o), max(0, frames + min(0, -o))):
-                a_data[row_a, frame + d_a] += b_data[row_b, frame + d_b]
+                a_data[row_a, frame + d_a] += b_data[row_b, frame + d_b] * mult
 
         return
 

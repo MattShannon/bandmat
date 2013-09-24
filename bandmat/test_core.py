@@ -141,13 +141,16 @@ class TestCore(unittest.TestCase):
     def test_BandMat_plus_equals_band_of(self, its = 100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            mult = randn()
             target_bm = gen_BandMat(size)
             mat_bm = gen_BandMat(size)
             target_full = target_bm.full()
             mat_full = mat_bm.full()
 
-            target_bm.plus_equals_band_of(mat_bm)
-            target_full += fl.band_ec(target_bm.l, target_bm.u, mat_full)
+            target_bm.plus_equals_band_of(mat_bm, mult)
+            target_full += (
+                fl.band_ec(target_bm.l, target_bm.u, mat_full) * mult
+            )
             assert_allclose(target_bm.full(), target_full)
 
     def test_BandMat_add(self, its = 100):
