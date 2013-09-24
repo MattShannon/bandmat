@@ -62,6 +62,10 @@ Alternatively you can download bandmat from PyPI and install it using::
 The latest development version of bandmat is available from a github repository
 (see below).
 
+To check that bandmat is installed correctly you can run the test suite::
+
+    python -m unittest discover bandmat
+
 Examples
 --------
 
