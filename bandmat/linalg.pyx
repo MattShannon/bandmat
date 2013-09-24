@@ -51,7 +51,7 @@ def cholesky(mat_bm, lower = False, alternative = False):
 
     `mat_bm` (representing P above) should represent the whole matrix, not just
     the lower or upper triangles.
-    If the matrix represented by `mat_bm` is not symmetric then behavior of
+    If the matrix represented by `mat_bm` is not symmetric then the behavior of
     this function is undefined (currently either the upper or lower triangle is
     used to compute the Cholesky factor and the rest of the matrix is ignored).
     If `lower` is True then the lower Cholesky factor is returned, and
@@ -73,12 +73,12 @@ def cholesky(mat_bm, lower = False, alternative = False):
     if mat_bm.size == 0:
         chol_bm = BandMat(l, u, np.zeros((depth + 1, 0)))
     else:
-        prec_half_data = mat_bm.data[(depth - u):(depth + l + 1)]
+        mat_half_data = mat_bm.data[(depth - u):(depth + l + 1)]
         if alternative:
-            chol_data = sla.cholesky_banded(prec_half_data[::-1, ::-1],
+            chol_data = sla.cholesky_banded(mat_half_data[::-1, ::-1],
                                             lower = not lower)[::-1, ::-1]
         else:
-            chol_data = sla.cholesky_banded(prec_half_data, lower = lower)
+            chol_data = sla.cholesky_banded(mat_half_data, lower = lower)
         chol_bm = BandMat(l, u, chol_data)
 
     return chol_bm
@@ -86,10 +86,12 @@ def cholesky(mat_bm, lower = False, alternative = False):
 def cho_solve(chol_bm, b):
     """Solves a matrix equation given the Cholesky decomposition of the matrix.
 
-    Solves A . x = b for x, where A is a positive definite matrix, x and b are
-    vectors, and . indicates matrix multiplication.
+    Solves A . x = b for x, where A is a positive definite banded matrix, x and
+    b are vectors, and . indicates matrix multiplication.
     `chol_bm` is a Cholesky factor of A (either upper or lower).
     """
+    assert chol_bm.size == len(b)
+
     if chol_bm.transposed:
         chol_bm = chol_bm.T
 
