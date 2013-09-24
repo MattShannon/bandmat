@@ -10,12 +10,18 @@ import bandmat.full as fl
 import bandmat.testhelp as th
 
 import unittest
+import doctest
 import numpy as np
 import random
 from numpy.random import randn, randint
 
 def randBool():
     return randint(0, 2) == 0
+
+def gen_array(ranks = [0, 1, 2, 3]):
+    rank = random.choice(ranks)
+    shape = tuple([ randint(5) for _ in range(rank) ])
+    return np.asarray(randn(*shape))
 
 def gen_BandMat_simple(size):
     """Generates a random BandMat."""
@@ -24,6 +30,10 @@ def gen_BandMat_simple(size):
     data = randn(l + u + 1, size)
     transposed = randBool()
     return bm.BandMat(l, u, data, transposed = transposed)
+
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite(th))
+    return tests
 
 class TestTestHelp(unittest.TestCase):
     def test_assert_allclose(self):
@@ -76,6 +86,33 @@ class TestTestHelp(unittest.TestCase):
             mat_full = mat_bm.full()
             th.randomize_extra_entries_bm(mat_bm)
             th.assert_allequal(mat_bm.full(), mat_full)
+
+    def test_get_array_mem(self, its = 50):
+        # (FIXME : these are not great tests, since not familiar enough with
+        #   numpy internals to know what sorts of changes in memory layout are
+        #   possible and how they might arise in a realistic program)
+        for it in range(its):
+            x = gen_array()
+            array_mem = th.get_array_mem(x)
+            x *= 2.0
+            assert th.get_array_mem(x) == array_mem
+
+            x = gen_array()
+            array_mem = th.get_array_mem(x)
+            x.shape = x.shape + (1,)
+            assert th.get_array_mem(x) != array_mem
+
+            x = gen_array(ranks = [1, 2, 3])
+            array_mem = th.get_array_mem(x)
+            shape = x.shape
+            strides = x.strides
+            shape_new = x.T.shape
+            strides_new = x.T.strides
+            if np.prod(shape_new) != 0:
+                x.shape = shape_new
+                x.strides = strides_new
+                if shape_new != shape or strides_new != strides:
+                    assert th.get_array_mem(x) != array_mem
 
 if __name__ == '__main__':
     unittest.main()

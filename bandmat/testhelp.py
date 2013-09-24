@@ -47,3 +47,20 @@ def randomize_extra_entries_bm(mat_bm):
         randomize_extra_entries(mat_bm.u, mat_bm.l, mat_bm.data)
     else:
         randomize_extra_entries(mat_bm.l, mat_bm.u, mat_bm.data)
+
+def get_array_mem(*arrays):
+    """Returns a representation of the memory layout of an array.
+
+    This is intended to be used to check whether the memory used by a given
+    numpy array, or how this memory is mapped into the logical indices of the
+    tensor it represents, changes between two points in time.
+
+    Example usage:
+    >>> import numpy as np
+    >>> x = np.array([2.0, 3.0, 4.0])
+    >>> array_mem = get_array_mem(x)
+    >>> # some potentially complicated operation
+    >>> x *= 2.0
+    >>> assert get_array_mem(x) == array_mem
+    """
+    return [ array.__array_interface__ for array in arrays ]
