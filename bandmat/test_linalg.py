@@ -67,6 +67,7 @@ class TestLinAlg(unittest.TestCase):
                                    alternative = alternative)
             assert chol_bm.l == (depth if lower else 0)
             assert chol_bm.u == (0 if lower else depth)
+            assert not np.may_share_memory(chol_bm.data, mat_bm.data)
 
             if lower != alternative:
                 mat_bm_again = bm.dot_mm(chol_bm, chol_bm.T)
@@ -81,6 +82,7 @@ class TestLinAlg(unittest.TestCase):
             depth = chol_bm.l + chol_bm.u
 
             band_of_inv_bm = bla.band_of_inverse_from_chol(chol_bm)
+            assert not np.may_share_memory(band_of_inv_bm.data, chol_bm.data)
 
             mat_bm = (bm.dot_mm(chol_bm, chol_bm.T) if chol_bm.u == 0
                       else bm.dot_mm(chol_bm.T, chol_bm))
@@ -97,6 +99,7 @@ class TestLinAlg(unittest.TestCase):
             depth = mat_bm.l
 
             band_of_inv_bm = bla.band_of_inverse(mat_bm)
+            assert not np.may_share_memory(band_of_inv_bm.data, mat_bm.data)
 
             band_of_inv_full_good = fl.band_ec(
                 depth, depth,
