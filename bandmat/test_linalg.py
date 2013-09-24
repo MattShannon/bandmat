@@ -102,6 +102,39 @@ class TestLinAlg(unittest.TestCase):
             assert not np.may_share_memory(x, chol_bm.data)
             assert not np.may_share_memory(x, b)
 
+    def test_solve(self, its = 50):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            b = randn(size)
+            # the below tries to ensure the matrix is well-conditioned
+            a_bm = gen_BandMat(size) + bm.diag(np.ones((size,)) * 10.0)
+            a_full = a_bm.full()
+
+            x = bla.solve(a_bm, b)
+            if size == 0:
+                x_good = np.zeros((size,))
+            else:
+                x_good = sla.solve(a_full, b)
+            assert_allclose(x, x_good)
+            assert not np.may_share_memory(x, a_bm.data)
+            assert not np.may_share_memory(x, b)
+
+    def test_solveh(self, its = 50):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            b = randn(size)
+            a_bm = gen_pos_def_BandMat(size)
+            a_full = a_bm.full()
+
+            x = bla.solveh(a_bm, b)
+            if size == 0:
+                x_good = np.zeros((size,))
+            else:
+                x_good = sla.solve(a_full, b, sym_pos = True)
+            assert_allclose(x, x_good)
+            assert not np.may_share_memory(x, a_bm.data)
+            assert not np.may_share_memory(x, b)
+
     def test_band_of_inverse_from_chol(self, its = 50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])

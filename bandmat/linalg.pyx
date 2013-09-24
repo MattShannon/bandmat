@@ -99,6 +99,61 @@ def cho_solve(chol_bm, b):
     x = sla.cho_solve_banded((chol_bm.data, lower), b)
     return x
 
+def solve(a_bm, b):
+    """Solves a matrix equation.
+
+    Solves A . x = b for x, where A is a square banded matrix, x and b are
+    vectors, and . indicates matrix multiplication.
+    """
+    assert a_bm.size == len(b)
+
+    # below is necessary since sla.solve_banded does not have a transpose flag,
+    #   and so is not capable of working with the transposed matrix directly.
+    #   (In fact (surprisingly!) the underlying LAPACK function dgbsv does not
+    #   have a transpose flag either, though gbsv calls dgbtrf and dgbtrs, and
+    #   dgbtrs does have a transpose flag, so LAPACK is capable of working with
+    #   the transposed matrix directly in principle).
+    if a_bm.transposed:
+        a_bm = a_bm.equiv(transposed_new = False)
+
+    if a_bm.size == 0:
+        x = np.zeros_like(b)
+    else:
+        x = sla.solve_banded((a_bm.l, a_bm.u), a_bm.data, b)
+    return x
+
+def solveh(a_bm, b):
+    """Solves a positive definite matrix equation.
+
+    Solves A . x = b for x, where A is a positive definite banded matrix, x and
+    b are vectors, and . indicates matrix multiplication.
+
+    `a_bm` (representing A above) should represent the whole matrix, not just
+    the lower or upper triangles.
+    If the matrix represented by `a_bm` is not symmetric then the behavior of
+    this function is undefined (currently either the upper or lower triangle is
+    used and the rest of the matrix is ignored).
+    """
+    assert a_bm.size == len(b)
+
+    if a_bm.transposed:
+        a_bm = a_bm.T
+
+    depth = a_bm.l
+    assert a_bm.u == depth
+    assert depth >= 0
+
+    lower = False
+    l = depth if lower else 0
+    u = 0 if lower else depth
+
+    if a_bm.size == 0:
+        x = np.zeros_like(b)
+    else:
+        a_half_data = a_bm.data[(depth - u):(depth + l + 1)]
+        x = sla.solveh_banded(a_half_data, b, lower = lower)
+    return x
+
 @cython.boundscheck(False)
 def band_of_inverse_from_chol(chol_bm):
     """Computes the band of the inverse of a positive definite banded matrix.
