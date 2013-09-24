@@ -461,6 +461,49 @@ class BandMat(object):
         self.data.__itruediv__(mult)
         return self
 
+    def sub_matrix_view(self, start, end):
+        """Returns a sub-matrix of this matrix.
+
+        This is implemented by taking a view of the underlying data array.
+        To obtain a BandMat with a fresh underlying data array, `.copy_exact()`
+        should be called on the result.
+
+        The expression `mat_bm.sub_matrix_view[start, end]` where `mat_bm` is a
+        BandMat is the equivalent of:
+
+            a_full[start:end, start:end]
+
+        where `a_full` is a square numpy array.
+        """
+        assert 0 <= start <= end <= self.size
+        return BandMat(self.l, self.u, self.data[:, start:end],
+                       transposed = self.transposed)
+
+    def embed_as_sub_matrix(self, start, size):
+        """Returns a new matrix containing this matrix as a sub-matrix.
+
+        The statement `b_bm = a_bm.embed_as_sub_matrix(start, size)` where
+        `a_bm` is a BandMat is the equivalent of:
+
+            end = start + len(a_full)
+            b_full = np.zeros((size, size))
+            b_full[start:end, start:end] = a_full
+
+        where `a_full` is a square numpy array.
+        """
+        end = start + self.size
+        assert 0 <= start <= end <= size
+
+        l, u = self.l, self.u
+        ll, uu = (u, l) if self.transposed else (l, u)
+
+        data = np.empty((l + u + 1, size))
+        data[:, 0:start] = 0.0
+        data[:, start:end] = self.data
+        data[:, end:size] = 0.0
+        fl.zero_extra_entries(ll, uu, data[:, start:end])
+        return BandMat(self.l, self.u, data, transposed = self.transposed)
+
 def zeros(l, u, size):
     """Returns the zero matrix as a BandMat.
 

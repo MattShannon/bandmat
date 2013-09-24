@@ -414,6 +414,39 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(TypeError):
                 a_bm /= a_bm
 
+    def test_BandMat_sub_matrix_view(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            start = randint(size + 1)
+            end = randint(size + 1)
+            if start > end:
+                start, end = end, start
+            a_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+
+            b_bm = a_bm.sub_matrix_view(start, end)
+            b_full = a_full[start:end, start:end]
+            assert_allclose(b_bm.full(), b_full)
+            assert b_bm.data.base is a_bm.data
+            if end > start:
+                assert np.may_share_memory(b_bm.data, a_bm.data)
+
+    def test_BandMat_embed_as_sub_matrix(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            start = randint(size + 1)
+            end = randint(size + 1)
+            if start > end:
+                start, end = end, start
+            a_bm = gen_BandMat(end - start)
+            a_full = a_bm.full()
+
+            b_bm = a_bm.embed_as_sub_matrix(start, size)
+            b_full = np.zeros((size, size))
+            b_full[start:end, start:end] = a_full
+            assert_allclose(b_bm.full(), b_full)
+            assert not np.may_share_memory(b_bm.data, a_bm.data)
+
     def test_zeros(self, its = 50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
