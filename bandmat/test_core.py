@@ -47,6 +47,7 @@ class TestCore(unittest.TestCase):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
+            a_full = a_bm.full()
             l, u = a_bm.l, a_bm.u
 
             # N.B. these tests are not really testing much of anything (they
@@ -55,9 +56,9 @@ class TestCore(unittest.TestCase):
             #   of the definition of the representation used by BandMat in the
             #   two cases (transposed True and transposed False).
             if a_bm.transposed:
-                assert_allequal(a_bm.full().T, fl.band_c(u, l, a_bm.data))
+                assert_allequal(a_full.T, fl.band_c(u, l, a_bm.data))
             else:
-                assert_allequal(a_bm.full(), fl.band_c(l, u, a_bm.data))
+                assert_allequal(a_full, fl.band_c(l, u, a_bm.data))
 
     def test_BandMat_T(self, its = 50):
         for it in range(its):
