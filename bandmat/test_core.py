@@ -60,12 +60,18 @@ class TestCore(unittest.TestCase):
             else:
                 assert_allequal(a_full, fl.band_c(l, u, a_bm.data))
 
+            assert not np.may_share_memory(a_full, a_bm.data)
+
     def test_BandMat_T(self, its = 50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
 
             assert_allequal(a_bm.T.full(), a_bm.full().T)
+
+            assert a_bm.T.data is a_bm.data
+            if size > 0:
+                assert np.may_share_memory(a_bm.T.data, a_bm.data)
 
     def test_BandMat_copy_exact(self, its = 50):
         for it in range(its):
@@ -80,6 +86,9 @@ class TestCore(unittest.TestCase):
 
             # check that copy represents the same matrix
             assert_allequal(mat_bm_new.full(), mat_full_orig)
+
+            # check that copy does not share memory with original
+            assert not np.may_share_memory(mat_bm_new.data, mat_bm.data)
 
             # check that mutating the copy does not change the original
             mat_bm_new.data += 1.0
@@ -98,6 +107,9 @@ class TestCore(unittest.TestCase):
 
             # check that copy represents the same matrix
             assert_allequal(mat_bm_new.full(), mat_full_orig)
+
+            # check that copy does not share memory with original
+            assert not np.may_share_memory(mat_bm_new.data, mat_bm.data)
 
             # check that mutating the copy does not change the original
             mat_bm_new.data += 1.0
@@ -131,6 +143,8 @@ class TestCore(unittest.TestCase):
                 assert mat_bm_new.u == u_new_value
                 assert mat_bm_new.transposed == transposed_new_value
                 assert_allequal(mat_bm_new.full(), mat_bm.full())
+                assert not np.may_share_memory(mat_bm_new.data, mat_bm.data)
+
                 if zero_extra:
                     mat_new_data_good = (
                         fl.band_e(u_new_value, l_new_value, mat_bm.full().T)
@@ -147,12 +161,17 @@ class TestCore(unittest.TestCase):
             mat_bm = gen_BandMat(size)
             target_full = target_bm.full()
             mat_full = mat_bm.full()
+            target_bm_data_id = id(target_bm.data)
+            mat_bm_data_id = id(mat_bm.data)
 
             target_bm.plus_equals_band_of(mat_bm, mult)
             target_full += (
                 fl.band_ec(target_bm.l, target_bm.u, mat_full) * mult
             )
             assert_allclose(target_bm.full(), target_full)
+
+            assert id(target_bm.data) == target_bm_data_id
+            assert id(mat_bm.data) == mat_bm_data_id
 
     def test_BandMat_add(self, its = 100):
         for it in range(its):
@@ -165,6 +184,8 @@ class TestCore(unittest.TestCase):
             c_bm = a_bm + b_bm
             c_full = a_full + b_full
             assert_allclose(c_bm.full(), c_full)
+            assert not np.may_share_memory(c_bm.data, a_bm.data)
+            assert not np.may_share_memory(c_bm.data, b_bm.data)
 
             with self.assertRaises(TypeError):
                 a_bm + 1.0
@@ -182,6 +203,8 @@ class TestCore(unittest.TestCase):
             c_bm = a_bm - b_bm
             c_full = a_full - b_full
             assert_allclose(c_bm.full(), c_full)
+            assert not np.may_share_memory(c_bm.data, a_bm.data)
+            assert not np.may_share_memory(c_bm.data, b_bm.data)
 
             with self.assertRaises(TypeError):
                 a_bm - 1.0
@@ -195,11 +218,16 @@ class TestCore(unittest.TestCase):
             b_bm = gen_BandMat(size)
             a_full = a_bm.full()
             b_full = b_bm.full()
+            a_bm_data_id = id(a_bm.data)
+            b_bm_data_id = id(b_bm.data)
 
             if a_bm.l >= b_bm.l and a_bm.u >= b_bm.u:
                 a_bm += b_bm
                 a_full += b_full
                 assert_allclose(a_bm.full(), a_full)
+
+                assert id(a_bm.data) == a_bm_data_id
+                assert id(b_bm.data) == b_bm_data_id
             else:
                 with self.assertRaises(AssertionError):
                     a_bm += b_bm
@@ -214,11 +242,16 @@ class TestCore(unittest.TestCase):
             b_bm = gen_BandMat(size)
             a_full = a_bm.full()
             b_full = b_bm.full()
+            a_bm_data_id = id(a_bm.data)
+            b_bm_data_id = id(b_bm.data)
 
             if a_bm.l >= b_bm.l and a_bm.u >= b_bm.u:
                 a_bm -= b_bm
                 a_full -= b_full
                 assert_allclose(a_bm.full(), a_full)
+
+                assert id(a_bm.data) == a_bm_data_id
+                assert id(b_bm.data) == b_bm_data_id
             else:
                 with self.assertRaises(AssertionError):
                     a_bm -= b_bm
@@ -235,6 +268,7 @@ class TestCore(unittest.TestCase):
             b_bm = +a_bm
             b_full = +a_full
             assert_allclose(b_bm.full(), b_full)
+            assert not np.may_share_memory(b_bm.data, a_bm.data)
 
     def test_BandMat_neg(self, its = 100):
         for it in range(its):
@@ -245,6 +279,7 @@ class TestCore(unittest.TestCase):
             b_bm = -a_bm
             b_full = -a_full
             assert_allclose(b_bm.full(), b_full)
+            assert not np.may_share_memory(b_bm.data, a_bm.data)
 
     def test_BandMat_mul_and_rmul(self, its = 100):
         for it in range(its):
@@ -258,12 +293,14 @@ class TestCore(unittest.TestCase):
             assert b_bm.l == a_bm.l
             assert b_bm.u == a_bm.u
             assert_allclose(b_bm.full(), b_full)
+            assert not np.may_share_memory(b_bm.data, a_bm.data)
 
             c_bm = mult * a_bm
             c_full = mult * a_full
             assert c_bm.l == a_bm.l
             assert c_bm.u == a_bm.u
             assert_allclose(c_bm.full(), c_full)
+            assert not np.may_share_memory(c_bm.data, a_bm.data)
 
             with self.assertRaises(TypeError):
                 a_bm * a_bm
@@ -280,30 +317,35 @@ class TestCore(unittest.TestCase):
             assert b_bm.l == a_bm.l
             assert b_bm.u == a_bm.u
             assert_allclose(b_bm.full(), b_full)
+            assert not np.may_share_memory(b_bm.data, a_bm.data)
 
             b_bm = a_bm / mult
             b_full = a_full / mult
             assert b_bm.l == a_bm.l
             assert b_bm.u == a_bm.u
             assert_allclose(b_bm.full(), b_full)
+            assert not np.may_share_memory(b_bm.data, a_bm.data)
 
             b_bm = a_bm.__floordiv__(mult)
             b_full = a_full.__floordiv__(mult)
             assert b_bm.l == a_bm.l
             assert b_bm.u == a_bm.u
             assert_allclose(b_bm.full(), b_full)
+            assert not np.may_share_memory(b_bm.data, a_bm.data)
 
             b_bm = a_bm.__div__(mult)
             b_full = a_full.__div__(mult)
             assert b_bm.l == a_bm.l
             assert b_bm.u == a_bm.u
             assert_allclose(b_bm.full(), b_full)
+            assert not np.may_share_memory(b_bm.data, a_bm.data)
 
             b_bm = a_bm.__truediv__(mult)
             b_full = a_full.__truediv__(mult)
             assert b_bm.l == a_bm.l
             assert b_bm.u == a_bm.u
             assert_allclose(b_bm.full(), b_full)
+            assert not np.may_share_memory(b_bm.data, a_bm.data)
 
             with self.assertRaises(TypeError):
                 a_bm // a_bm
@@ -320,10 +362,13 @@ class TestCore(unittest.TestCase):
             mult = randn()
             a_bm = gen_BandMat(size)
             a_full = a_bm.full()
+            a_bm_data_id = id(a_bm.data)
 
             a_bm *= mult
             a_full *= mult
             assert_allclose(a_bm.full(), a_full)
+
+            assert id(a_bm.data) == a_bm_data_id
 
             with self.assertRaises(TypeError):
                 a_bm *= a_bm
@@ -335,33 +380,43 @@ class TestCore(unittest.TestCase):
 
             a_bm = gen_BandMat(size)
             a_full = a_bm.full()
+            a_bm_data_id = id(a_bm.data)
             a_bm //= mult
             a_full //= mult
             assert_allclose(a_bm.full(), a_full)
+            assert id(a_bm.data) == a_bm_data_id
 
             a_bm = gen_BandMat(size)
             a_full = a_bm.full()
+            a_bm_data_id = id(a_bm.data)
             a_bm /= mult
             a_full /= mult
             assert_allclose(a_bm.full(), a_full)
+            assert id(a_bm.data) == a_bm_data_id
 
             a_bm = gen_BandMat(size)
             a_full = a_bm.full()
+            a_bm_data_id = id(a_bm.data)
             a_bm.__ifloordiv__(mult)
             a_full.__ifloordiv__(mult)
             assert_allclose(a_bm.full(), a_full)
+            assert id(a_bm.data) == a_bm_data_id
 
             a_bm = gen_BandMat(size)
             a_full = a_bm.full()
+            a_bm_data_id = id(a_bm.data)
             a_bm.__idiv__(mult)
             a_full.__idiv__(mult)
             assert_allclose(a_bm.full(), a_full)
+            assert id(a_bm.data) == a_bm_data_id
 
             a_bm = gen_BandMat(size)
             a_full = a_bm.full()
+            a_bm_data_id = id(a_bm.data)
             a_bm.__itruediv__(mult)
             a_full.__itruediv__(mult)
             assert_allclose(a_bm.full(), a_full)
+            assert id(a_bm.data) == a_bm_data_id
 
             with self.assertRaises(TypeError):
                 a_bm //= a_bm
@@ -392,6 +447,7 @@ class TestCore(unittest.TestCase):
                 assert mat_bm.l == l
                 assert mat_bm.u == u
                 assert_allequal(mat_bm.full(), mat_full)
+                assert not np.may_share_memory(mat_bm.data, mat_full)
             else:
                 self.assertRaises(AssertionError, bm.from_full, l, u, mat_full)
 
@@ -406,6 +462,7 @@ class TestCore(unittest.TestCase):
 
             mat_full_good = fl.band_c(l, u, mat_rect)
             assert_allequal(mat_bm.full(), mat_full_good)
+            assert not np.may_share_memory(mat_bm.data, mat_rect)
 
     def test_band_e_bm(self, its = 50):
         for it in range(its):
@@ -418,6 +475,7 @@ class TestCore(unittest.TestCase):
 
             mat_rect_good = fl.band_e(l, u, mat_bm.full())
             assert_allequal(mat_rect, mat_rect_good)
+            assert not np.may_share_memory(mat_rect, mat_bm.data)
 
     def test_band_ec_bm_view(self, its = 50):
         for it in range(its):
@@ -430,6 +488,9 @@ class TestCore(unittest.TestCase):
 
             b_full_good = fl.band_ec(l, u, a_bm.full())
             assert_allequal(b_bm.full(), b_full_good)
+            assert b_bm.data.base is a_bm.data
+            if size > 0:
+                assert np.may_share_memory(b_bm.data, a_bm.data)
 
     def test_band_ec_bm(self, its = 50):
         for it in range(its):
@@ -442,6 +503,7 @@ class TestCore(unittest.TestCase):
 
             b_full_good = fl.band_ec(l, u, a_bm.full())
             assert_allequal(b_bm.full(), b_full_good)
+            assert not np.may_share_memory(b_bm.data, a_bm.data)
 
     def test_diag(self, its = 50):
         for it in range(its):
@@ -451,10 +513,16 @@ class TestCore(unittest.TestCase):
             mat_bm = bm.diag(vec)
             assert isinstance(mat_bm, bm.BandMat)
             assert_allequal(mat_bm.full(), np.diag(vec))
+            assert mat_bm.data.base is vec
+            if size > 0:
+                assert np.may_share_memory(mat_bm.data, vec)
 
             mat_bm = gen_BandMat(size)
             vec = bm.diag(mat_bm)
             assert_allequal(vec, np.diag(mat_bm.full()))
+            assert vec.base is mat_bm.data
+            if size > 0:
+                assert np.may_share_memory(vec, mat_bm.data)
 
 if __name__ == '__main__':
     unittest.main()
