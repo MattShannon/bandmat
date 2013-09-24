@@ -17,15 +17,25 @@ cimport cython
 cnp.import_array()
 cnp.import_ufunc()
 
-def cholesky(mat_bm, lower = False):
+def cholesky(mat_bm, lower = False, alternative = False):
     """Computes the Cholesky factor of a positive definite banded matrix.
 
-    The Cholesky decomposition of a positive definite matrix P is P = L . L.T,
-    where the lower Cholesky factor L is lower-triangular, the upper Cholesky
-    factor L.T is upper-triangular, and . indicates matrix multiplication.
+    The conventional Cholesky decomposition of a positive definite matrix P is
+    P = L . L.T, where the lower Cholesky factor L is lower-triangular, the
+    upper Cholesky factor L.T is upper-triangular, and . indicates matrix
+    multiplication.
     Each positive definite matrix has a unique Cholesky decomposition.
     Given a positive definite banded matrix, this function computes its
     Cholesky factor, which is also a banded matrix.
+
+    This function can also work with the alternative Cholesky decomposition.
+    The alternative Cholesky decomposition of P is P = L.T . L, where again L
+    is lower-triangular.
+    Whereas the conventional Cholesky decomposition is intimately connected
+    with linear Gaussian autoregressive probabilistic models defined forwards
+    in time, the alternative Cholesky decomposition is intimately connected
+    with linear Gaussian autoregressive probabilistic models defined backwards
+    in time.
 
     `mat_bm` (representing P above) should represent the whole matrix, not just
     the lower or upper triangles.
@@ -34,6 +44,9 @@ def cholesky(mat_bm, lower = False):
     used to compute the Cholesky factor and the rest of the matrix is ignored).
     If `lower` is True then the lower Cholesky factor is returned, and
     otherwise the upper Cholesky factor is returned.
+    If `alternative` is True then the Cholesky factor returned is for the
+    alternative Cholesky decomposition, and otherwise it is for the
+    conventional Cholesky decomposition.
     """
     if mat_bm.transposed:
         mat_bm = mat_bm.T
@@ -49,7 +62,11 @@ def cholesky(mat_bm, lower = False):
         chol_bm = BandMat(l, u, np.zeros((depth + 1, 0)))
     else:
         prec_half_data = mat_bm.data[(depth - u):(depth + l + 1)]
-        chol_data = sla.cholesky_banded(prec_half_data, lower = lower)
+        if alternative:
+            chol_data = sla.cholesky_banded(prec_half_data[::-1, ::-1],
+                                            lower = not lower)[::-1, ::-1]
+        else:
+            chol_data = sla.cholesky_banded(prec_half_data, lower = lower)
         chol_bm = BandMat(l, u, chol_data)
 
     return chol_bm

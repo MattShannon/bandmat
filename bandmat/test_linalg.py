@@ -61,12 +61,14 @@ class TestLinAlg(unittest.TestCase):
             mat_bm = gen_pos_def_BandMat(size)
             depth = mat_bm.l
             lower = randBool()
+            alternative = randBool()
 
-            chol_bm = bla.cholesky(mat_bm, lower = lower)
+            chol_bm = bla.cholesky(mat_bm, lower = lower,
+                                   alternative = alternative)
             assert chol_bm.l == (depth if lower else 0)
             assert chol_bm.u == (0 if lower else depth)
 
-            if lower:
+            if lower != alternative:
                 mat_bm_again = bm.dot_mm(chol_bm, chol_bm.T)
             else:
                 mat_bm_again = bm.dot_mm(chol_bm.T, chol_bm)
