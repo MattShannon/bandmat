@@ -30,9 +30,10 @@ def gen_BandMat(size, l = None, u = None, transposed = None):
         transposed = randBool()
     return bm.BandMat(l, u, data, transposed = transposed)
 
-# package-level docstring tests (N.B. includes other modules, not just core)
 def load_tests(loader, tests, ignore):
+    # package-level doctests (N.B. includes other modules, not just core)
     tests.addTests(doctest.DocTestSuite(bm))
+    tests.addTests(doctest.DocTestSuite(bm.core))
     return tests
 
 class TestCore(unittest.TestCase):
@@ -494,6 +495,19 @@ class TestCore(unittest.TestCase):
             b_full_good = fl.band_ec(l, u, a_bm.full())
             assert_allequal(b_bm.full(), b_full_good)
             assert not np.may_share_memory(b_bm.data, a_bm.data)
+
+    def test_band_e_bm_common(self, its = 50):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            num_bms = randint(5)
+            mat_bms = [ gen_BandMat(size) for _ in range(num_bms) ]
+            if num_bms > 0:
+                l = max([ mat_bm.l for mat_bm in mat_bms ])
+                u = max([ mat_bm.u for mat_bm in mat_bms ])
+
+            mat_rects = bm.band_e_bm_common(*mat_bms)
+            for mat_bm, mat_rect in zip(mat_bms, mat_rects):
+                assert_allclose(mat_rect, bm.band_e_bm(l, u, mat_bm))
 
     def test_diag(self, its = 50):
         for it in range(its):

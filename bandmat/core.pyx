@@ -559,6 +559,37 @@ def band_ec_bm(l, u, mat_bm):
     """
     return band_ec_bm_view(l, u, mat_bm).copy_exact()
 
+def band_e_bm_common(*mat_bms):
+    """Extracts the band from several BandMats in a common way.
+
+    The same band is used for each of the BandMats, and this band is the
+    smallest band that encompasses the bands of all the BandMats.
+    This allows BandMats to be compared with the same tools used to compare
+    conventional numpy arrays (and without having to explicitly construct the
+    corresponding full matrices).
+
+    Example usage:
+    >>> import bandmat as bm
+    >>> cc = bm.band_e_bm_common
+    >>> a_bm = bm.zeros(3, 2, 10)
+    >>> b_bm = bm.zeros(1, 3, 10).T
+    >>> # these represent the same matrix
+    >>> np.allclose(a_bm.full(), b_bm.full())
+    True
+    >>> # naive comparison doesn't work
+    >>> np.allclose(a_bm.data, b_bm.data)
+    False
+    >>> # comparison after normalizing works
+    >>> np.allclose(*cc(a_bm, b_bm))
+    True
+    """
+    if not mat_bms:
+        return []
+    else:
+        l = max([ mat_bm.l for mat_bm in mat_bms ])
+        u = max([ mat_bm.u for mat_bm in mat_bms ])
+        return [ band_e_bm(l, u, mat_bm) for mat_bm in mat_bms ]
+
 def diag(vec_or_mat_bm):
     """Constructs a diagonal BandMat or extracts the diagonal from a BandMat.
 
