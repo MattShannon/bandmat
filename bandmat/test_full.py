@@ -117,9 +117,7 @@ class TestFull(unittest.TestCase):
             mat_rect_good = mat_rect.copy()
 
             fl.zero_extra_entries(l, u, mat_rect)
-
             mat_rect_good[:] = fl.band_e(l, u, fl.band_c(l, u, mat_rect_good))
-
             assert_allequal(mat_rect, mat_rect_good)
 
     def test_band_ce(self, its = 100):
@@ -131,12 +129,8 @@ class TestFull(unittest.TestCase):
             mat_rect = randn(l + u + 1, size)
 
             mat_rect_new = fl.band_ce(l, u, mat_rect)
-
-            # check definition
-            assert_allequal(
-                mat_rect_new,
-                fl.band_e(l, u, fl.band_c(l, u, mat_rect))
-            )
+            mat_rect_new_good = fl.band_e(l, u, fl.band_c(l, u, mat_rect))
+            assert_allequal(mat_rect_new, mat_rect_new_good)
 
             # check idempotent
             assert_allequal(
@@ -153,12 +147,8 @@ class TestFull(unittest.TestCase):
             mat_full = randn(size, size)
 
             mat_full_new = fl.band_ec(l, u, mat_full)
-
-            # check definition
-            assert_allequal(
-                mat_full_new,
-                fl.band_c(l, u, fl.band_e(l, u, mat_full))
-            )
+            mat_full_new_good = fl.band_c(l, u, fl.band_e(l, u, mat_full))
+            assert_allequal(mat_full_new, mat_full_new_good)
 
             # check idempotent
             assert_allequal(
@@ -175,12 +165,8 @@ class TestFull(unittest.TestCase):
             mat_rect = randn(l + u + 1, size)
 
             mat_rect_new = fl.band_cTe(l, u, mat_rect)
-
-            # check definition
-            assert_allequal(
-                mat_rect_new,
-                fl.band_e(u, l, fl.band_c(l, u, mat_rect).T)
-            )
+            mat_rect_new_good = fl.band_e(u, l, fl.band_c(l, u, mat_rect).T)
+            assert_allequal(mat_rect_new, mat_rect_new_good)
 
             # check a property to do with doing band_cTe twice
             assert_allequal(
