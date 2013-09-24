@@ -5,7 +5,7 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
-from bandmat.testhelp import assert_allequal
+from bandmat.testhelp import assert_allclose, assert_allequal
 
 import bandmat as bm
 import bandmat.full as fl
@@ -137,6 +137,65 @@ class TestCore(unittest.TestCase):
                         fl.band_e(l_new_value, u_new_value, mat_bm.full())
                     )
                     assert_allequal(mat_bm_new.data, mat_new_data_good)
+
+    def test_BandMat_plus_equals_band_of(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            target_bm = gen_BandMat(size)
+            mat_bm = gen_BandMat(size)
+            target_full = target_bm.full()
+            mat_full = mat_bm.full()
+
+            target_bm.plus_equals_band_of(mat_bm)
+            target_full += fl.band_ec(target_bm.l, target_bm.u, mat_full)
+            assert_allclose(target_bm.full(), target_full)
+
+    def test_BandMat_add(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            a_bm = gen_BandMat(size)
+            b_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+            b_full = b_bm.full()
+
+            c_bm = a_bm + b_bm
+            c_full = a_full + b_full
+            assert_allclose(c_bm.full(), c_full)
+
+            with self.assertRaises(TypeError):
+                a_bm + 1.0
+            with self.assertRaises(TypeError):
+                1.0 + a_bm
+
+    def test_BandMat_mul(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            mult = randn()
+            a_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+
+            b_bm = a_bm * mult
+            b_full = a_full * mult
+            assert b_bm.l == a_bm.l
+            assert b_bm.u == a_bm.u
+            assert_allclose(b_bm.full(), b_full)
+
+            with self.assertRaises(TypeError):
+                a_bm * a_bm
+
+    def test_BandMat_imul(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            mult = randn()
+            a_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+
+            a_bm *= mult
+            a_full *= mult
+            assert_allclose(a_bm.full(), a_full)
+
+            with self.assertRaises(TypeError):
+                a_bm *= a_bm
 
     def test_zeros(self, its = 50):
         for it in range(its):

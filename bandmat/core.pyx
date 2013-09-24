@@ -151,6 +151,118 @@ class BandMat(object):
 
         return BandMat(l_new, u_new, data_new, transposed = transposed_new)
 
+    @cython.boundscheck(False)
+    def plus_equals_band_of(self, mat_bm):
+        """Adds a band of another matrix to this matrix in-place.
+
+        Any entries of `mat_bm` which lie outside of `self` are ignored.
+        Thus to implement conventional matrix addition, `self` must be large
+        enough to contain the result of the addition, i.e. `self` must have at
+        least as many subdiagonals and superdiagonals as `mat_bm`.
+
+        The statement `target_bm.plus_equals_band_of(mat_bm)` where `target_bm`
+        and `mat_bm` are BandMats is the equivalent of:
+
+            target_full += band_ec(l, u, mat_full)
+
+        where `target_full` and `mat_full` are square numpy arrays.
+        Here `l` is `target_bm.l` and `u` is `target_bm.u`.
+        """
+        cdef long frames
+        cdef long l_a, u_a, transposed_a
+        cdef long l_b, u_b, transposed_b
+        cdef cnp.ndarray[cnp.float64_t, ndim=2] a_data
+        cdef cnp.ndarray[cnp.float64_t, ndim=2] b_data
+
+        l_a = self.l
+        u_a = self.u
+        a_data = self.data
+        transposed_a = self.transposed
+        assert l_a >= 0
+        assert u_a >= 0
+        assert a_data.shape[0] == l_a + u_a + 1
+
+        l_b = mat_bm.l
+        u_b = mat_bm.u
+        b_data = mat_bm.data
+        transposed_b = mat_bm.transposed
+        assert l_b >= 0
+        assert u_b >= 0
+        assert b_data.shape[0] == l_b + u_b + 1
+
+        frames = a_data.shape[1]
+        assert b_data.shape[1] == frames
+
+        cdef long o
+        cdef unsigned long row_a, row_b
+        cdef long d_a, d_b
+        cdef unsigned long frame
+
+        for o in range(-min(u_a, u_b), min(l_a, l_b) + 1):
+            row_a = (l_a - o) if transposed_a else (u_a + o)
+            row_b = (l_b - o) if transposed_b else (u_b + o)
+            d_a = o if transposed_a else 0
+            d_b = o if transposed_b else 0
+            for frame in range(max(0, -o), max(0, frames + min(0, -o))):
+                a_data[row_a, frame + d_a] += b_data[row_b, frame + d_b]
+
+        return
+
+    def __add__(self, other):
+        """Sums two banded matrices.
+
+        The expression `a_bm + b_bm` where `a_bm` and `b_bm` are BandMats is
+        the equivalent of:
+
+            a_full + b_full
+
+        where `a_full` and `b_full` are square numpy arrays.
+        """
+        if not isinstance(other, BandMat):
+            return NotImplemented
+
+        assert self.size == other.size
+        c_bm = self.equiv(l_new = max(self.l, other.l),
+                          u_new = max(self.u, other.u))
+        c_bm.plus_equals_band_of(other)
+        return c_bm
+
+    def __mul__(self, other):
+        """Multiplies a banded matrix by a scalar.
+
+        The expression `a_bm * mult` where `a_bm` is a BandMat is the
+        equivalent of:
+
+            a_full * mult
+
+        where `a_full` is a square numpy array.
+        """
+        try:
+            mult = float(other)
+        except:
+            return NotImplemented
+
+        return BandMat(self.l, self.u, self.data * mult,
+                       transposed = self.transposed)
+
+    def __imul__(self, other):
+        """Multiplies this matrix by a scalar in-place.
+
+        The statement `a_bm *= mult` where `a_bm` is a BandMat is the
+        equivalent of:
+
+            a_full *= mult
+
+        where `a_full` is a square numpy array.
+        """
+        try:
+            mult = float(other)
+        except:
+            return NotImplemented
+
+        self.data *= mult
+        return self
+
 def zeros(l, u, size):
     """Returns the zero matrix as a BandMat.
 

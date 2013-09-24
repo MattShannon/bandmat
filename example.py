@@ -23,7 +23,7 @@ b_bm = bm.BandMat(
 
 c_bm = bm.dot_mm(a_bm.T, b_bm)
 
-d_bm = bm.plus(a_bm, b_bm)
+d_bm = a_bm + b_bm
 
 a_full = a_bm.full()
 b_full = b_bm.full()

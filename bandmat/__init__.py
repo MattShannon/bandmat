@@ -69,7 +69,7 @@ Take the transpose:
 
 Banded matrix addition:
 >>> b_bm = bm.BandMat(0, 1, np.arange(10, dtype=np.float64).reshape((2, 5)))
->>> print bm.plus(a_bm, b_bm).full()
+>>> print (a_bm + b_bm).full()
 [[ 10.   2.   0.   0.   0.]
  [ 10.  12.   4.   0.   0.]
  [  0.  11.  14.   6.   0.]

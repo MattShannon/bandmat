@@ -20,50 +20,6 @@ def randBool():
     return randint(0, 2) == 0
 
 class TestTensor(unittest.TestCase):
-    def test_plus_equals_band_of(self, its = 100):
-        for it in range(its):
-            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
-            target_bm_orig = gen_BandMat(size)
-            mat_bm = gen_BandMat(size)
-
-            target_bm = target_bm_orig.copy_exact()
-            bm.plus_equals_band_of(target_bm, mat_bm)
-
-            target_full_good = target_bm_orig.full()
-            target_full_good += (
-                fl.band_ec(target_bm.l, target_bm.u, mat_bm.full())
-            )
-            assert_allclose(target_bm.full(), target_full_good)
-
-    def test_plus(self, its = 100):
-        for it in range(its):
-            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
-            a_bm = gen_BandMat(size)
-            b_bm = gen_BandMat(size)
-
-            c_bm = bm.plus(a_bm, b_bm)
-
-            c_full_good = a_bm.full() + b_bm.full()
-            assert_allclose(c_bm.full(), c_full_good)
-
-    def test_scalar_mult(self, its = 100):
-        for it in range(its):
-            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
-            a_bm = gen_BandMat(size)
-            mult = randn()
-            overwrite = randBool()
-
-            b_full_good = a_bm.full() * mult
-
-            if overwrite:
-                bm.scalar_mult(a_bm, mult, overwrite = True)
-                b_bm = a_bm
-            else:
-                b_bm = bm.scalar_mult(a_bm, mult)
-            assert b_bm.l == a_bm.l
-            assert b_bm.u == a_bm.u
-            assert_allclose(b_bm.full(), b_full_good)
-
     def test_dot_mv_plus_equals(self, its = 100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
