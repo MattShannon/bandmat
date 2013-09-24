@@ -21,6 +21,15 @@ from numpy.random import randn, randint
 def randBool():
     return randint(0, 2) == 0
 
+def gen_symmetric_BandMat(size, depth = None):
+    if depth is None:
+        depth = random.choice([0, 1, randint(0, 10)])
+    a_bm = gen_BandMat(size, l = depth, u = depth)
+    b_bm = a_bm + a_bm.T
+    randomize_extra_entries_bm(b_bm)
+    print 'transposed =', b_bm.transposed
+    return b_bm
+
 def gen_pos_def_BandMat(size, depth = None, contribRank = 2):
     """Generates a random positive definite BandMat."""
     assert contribRank >= 0
