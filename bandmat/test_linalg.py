@@ -15,6 +15,7 @@ import bandmat.linalg as bla
 import unittest
 import numpy as np
 import numpy.linalg as la
+import scipy.linalg as sla
 import random
 from numpy.random import randn, randint
 
@@ -83,6 +84,24 @@ class TestLinAlg(unittest.TestCase):
             else:
                 mat_bm_again = bm.dot_mm(chol_bm.T, chol_bm)
             assert_allclose(mat_bm_again.full(), mat_bm.full())
+
+    def test_cho_solve(self, its = 50):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            b = randn(size)
+            chol_bm = gen_chol_factor_BandMat(size)
+            depth = chol_bm.l + chol_bm.u
+            lower = (chol_bm.u == 0)
+            chol_full = chol_bm.full()
+
+            x = bla.cho_solve(chol_bm, b)
+            if size == 0:
+                x_good = np.zeros((size,))
+            else:
+                x_good = sla.cho_solve((chol_full, lower), b)
+            assert_allclose(x, x_good)
+            assert not np.may_share_memory(x, chol_bm.data)
+            assert not np.may_share_memory(x, b)
 
     def test_band_of_inverse_from_chol(self, its = 50):
         for it in range(its):

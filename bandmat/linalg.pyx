@@ -83,6 +83,20 @@ def cholesky(mat_bm, lower = False, alternative = False):
 
     return chol_bm
 
+def cho_solve(chol_bm, b):
+    """Solves a matrix equation given the Cholesky decomposition of the matrix.
+
+    Solves A . x = b for x, where A is a positive definite matrix, x and b are
+    vectors, and . indicates matrix multiplication.
+    `chol_bm` is a Cholesky factor of A (either upper or lower).
+    """
+    if chol_bm.transposed:
+        chol_bm = chol_bm.T
+
+    lower = (chol_bm.u == 0)
+    x = sla.cho_solve_banded((chol_bm.data, lower), b)
+    return x
+
 @cython.boundscheck(False)
 def band_of_inverse_from_chol(chol_bm):
     """Computes the band of the inverse of a positive definite banded matrix.
