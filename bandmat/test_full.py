@@ -61,6 +61,10 @@ class TestFull(unittest.TestCase):
                 fl.band_c(l, u, mat_rect) * mult
             )
 
+            # check output is a newly-created array
+            mat_full = fl.band_c(l, u, mat_rect)
+            assert not np.may_share_memory(mat_full, mat_rect)
+
     def test_band_e_basis(self, its = 100):
         """Checks band_e behaves correctly on canonical basis matrices."""
         for it in range(its):
@@ -107,6 +111,10 @@ class TestFull(unittest.TestCase):
                 fl.band_e(l, u, mat_full) * mult
             )
 
+            # check output is a newly-created array
+            mat_rect = fl.band_e(l, u, mat_full)
+            assert not np.may_share_memory(mat_rect, mat_full)
+
     def test_zero_extra_entries(self, its = 100):
         """Checks zero_extra_entries against its equivalent definition."""
         for it in range(its):
@@ -115,10 +123,12 @@ class TestFull(unittest.TestCase):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mat_rect = randn(l + u + 1, size)
             mat_rect_good = mat_rect.copy()
+            mat_rect_id = id(mat_rect)
 
             fl.zero_extra_entries(l, u, mat_rect)
             mat_rect_good[:] = fl.band_e(l, u, fl.band_c(l, u, mat_rect_good))
             assert_allequal(mat_rect, mat_rect_good)
+            assert id(mat_rect) == mat_rect_id
 
     def test_band_ce(self, its = 100):
         """Checks band_ce against its definition and required properties."""
@@ -131,6 +141,7 @@ class TestFull(unittest.TestCase):
             mat_rect_new = fl.band_ce(l, u, mat_rect)
             mat_rect_new_good = fl.band_e(l, u, fl.band_c(l, u, mat_rect))
             assert_allequal(mat_rect_new, mat_rect_new_good)
+            assert not np.may_share_memory(mat_rect_new, mat_rect)
 
             # check idempotent
             assert_allequal(
@@ -149,6 +160,7 @@ class TestFull(unittest.TestCase):
             mat_full_new = fl.band_ec(l, u, mat_full)
             mat_full_new_good = fl.band_c(l, u, fl.band_e(l, u, mat_full))
             assert_allequal(mat_full_new, mat_full_new_good)
+            assert not np.may_share_memory(mat_full_new, mat_full)
 
             # check idempotent
             assert_allequal(
@@ -167,6 +179,7 @@ class TestFull(unittest.TestCase):
             mat_rect_new = fl.band_cTe(l, u, mat_rect)
             mat_rect_new_good = fl.band_e(u, l, fl.band_c(l, u, mat_rect).T)
             assert_allequal(mat_rect_new, mat_rect_new_good)
+            assert not np.may_share_memory(mat_rect_new, mat_rect)
 
             # check a property to do with doing band_cTe twice
             assert_allequal(
@@ -176,9 +189,13 @@ class TestFull(unittest.TestCase):
 
             # check version that uses pre-specified target
             mat_rect_new2 = np.empty((l + u + 1, size))
+            mat_rect_id = id(mat_rect)
+            mat_rect_new2_id = id(mat_rect_new2)
             ret = fl.band_cTe(l, u, mat_rect, target_rect = mat_rect_new2)
             self.assertIsNone(ret)
             assert_allequal(mat_rect_new2, mat_rect_new)
+            assert id(mat_rect) == mat_rect_id
+            assert id(mat_rect_new2) == mat_rect_new2_id
 
 if __name__ == '__main__':
     unittest.main()
