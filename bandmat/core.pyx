@@ -494,7 +494,7 @@ def band_c_bm(l, u, mat_rect):
 
     where the returned value is a square numpy array.
     """
-    return BandMat(l, u, mat_rect)
+    return BandMat(l, u, mat_rect.copy())
 
 def band_e_bm(l, u, mat_bm):
     """Extracts a band of a BandMat.
