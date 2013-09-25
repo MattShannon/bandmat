@@ -632,16 +632,17 @@ def band_e_bm_common(*mat_bms):
     Example usage:
     >>> import bandmat as bm
     >>> cc = bm.band_e_bm_common
+    >>> def allclose(x, y): return x.shape == y.shape and np.allclose(x, y)
     >>> a_bm = bm.zeros(3, 2, 10)
     >>> b_bm = bm.zeros(1, 3, 10).T
     >>> # these represent the same matrix
-    >>> np.allclose(a_bm.full(), b_bm.full())
+    >>> allclose(a_bm.full(), b_bm.full())
     True
-    >>> # naive comparison doesn't work
-    >>> np.allclose(a_bm.data, b_bm.data)
+    >>> # naive comparison doesn't show this
+    >>> allclose(a_bm.data, b_bm.data)
     False
     >>> # comparison after normalizing works
-    >>> np.allclose(*cc(a_bm, b_bm))
+    >>> allclose(*cc(a_bm, b_bm))
     True
     """
     if not mat_bms:
