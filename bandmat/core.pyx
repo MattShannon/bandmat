@@ -461,6 +461,24 @@ class BandMat(object):
         self.data.__itruediv__(mult)
         return self
 
+    def reverse_view(self):
+        """Returns the "time-reversed" version of this matrix.
+
+        This function is implemented by taking a view of the underlying data
+        array.
+        To obtain a BandMat with a fresh underlying data array, `.copy_exact()`
+        should be called on the result.
+
+        The expression `a_bm.reverse_view()` where `a_bm` is a BandMat is the
+        equivalent of:
+
+            a_full[::-1, ::-1]
+
+        where `a_full` is a square numpy array.
+        """
+        return BandMat(self.u, self.l, self.data[::-1, ::-1],
+                       transposed = self.transposed)
+
     def sub_matrix_view(self, start, end):
         """Returns a sub-matrix of this matrix.
 

@@ -414,6 +414,19 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(TypeError):
                 a_bm /= a_bm
 
+    def test_BandMat_reverse_view(self, its = 100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            a_bm = gen_BandMat(size)
+            a_full = a_bm.full()
+
+            b_bm = a_bm.reverse_view()
+            b_full = a_full[::-1, ::-1]
+            assert_allclose(b_bm.full(), b_full)
+            assert b_bm.data.base is a_bm.data
+            if size > 0:
+                assert np.may_share_memory(b_bm.data, a_bm.data)
+
     def test_BandMat_sub_matrix_view(self, its = 100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
