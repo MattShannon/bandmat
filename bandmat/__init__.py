@@ -94,4 +94,4 @@ Banded matrix multiplication:
 from bandmat.core import *
 from bandmat.tensor import *
 
-__version__ = '0.2'
+__version__ = '0.3.dev1'
