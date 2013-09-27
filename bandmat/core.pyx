@@ -218,7 +218,10 @@ class BandMat(object):
 
         where `a_full` and `b_full` are square numpy arrays.
         """
-        if not isinstance(other, BandMat):
+        # (FIXME : is "is 0" the right way to test for this?)
+        if other is 0:
+            return self.copy_exact()
+        elif not isinstance(other, BandMat):
             return NotImplemented
 
         assert self.size == other.size
@@ -226,6 +229,13 @@ class BandMat(object):
                           u_new = max(self.u, other.u))
         c_bm.plus_equals_band_of(other)
         return c_bm
+
+    def __radd__(self, other):
+        if other is 0:
+            # this is so "sum" will work as expected
+            return self.copy_exact()
+        else:
+            return NotImplemented
 
     def __sub__(self, other):
         """Subtracts one banded matrix from another.
@@ -237,7 +247,9 @@ class BandMat(object):
 
         where `a_full` and `b_full` are square numpy arrays.
         """
-        if not isinstance(other, BandMat):
+        if other is 0:
+            return self.copy_exact()
+        elif not isinstance(other, BandMat):
             return NotImplemented
 
         assert self.size == other.size
@@ -245,6 +257,12 @@ class BandMat(object):
                           u_new = max(self.u, other.u))
         c_bm.plus_equals_band_of(other, mult = -1.0)
         return c_bm
+
+    def __rsub__(self, other):
+        if other is 0:
+            return self.__neg__()
+        else:
+            return NotImplemented
 
     def __iadd__(self, other):
         """Adds another matrix to this matrix in-place.
@@ -256,7 +274,9 @@ class BandMat(object):
 
         where `a_full` and `b_full` are square numpy arrays.
         """
-        if not isinstance(other, BandMat):
+        if other is 0:
+            return self
+        elif not isinstance(other, BandMat):
             return NotImplemented
 
         assert self.size == other.size
@@ -276,7 +296,9 @@ class BandMat(object):
 
         where `a_full` and `b_full` are square numpy arrays.
         """
-        if not isinstance(other, BandMat):
+        if other is 0:
+            return self
+        elif not isinstance(other, BandMat):
             return NotImplemented
 
         assert self.size == other.size

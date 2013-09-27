@@ -185,6 +185,16 @@ class TestCore(unittest.TestCase):
             assert not np.may_share_memory(c_bm.data, a_bm.data)
             assert not np.may_share_memory(c_bm.data, b_bm.data)
 
+            c_bm = a_bm + 0
+            c_full = a_full + 0
+            assert_allclose(c_bm.full(), c_full)
+            assert not np.may_share_memory(c_bm.data, a_bm.data)
+
+            c_bm = 0 + a_bm
+            c_full = 0 + a_full
+            assert_allclose(c_bm.full(), c_full)
+            assert not np.may_share_memory(c_bm.data, a_bm.data)
+
             with self.assertRaises(TypeError):
                 a_bm + 1.0
             with self.assertRaises(TypeError):
@@ -203,6 +213,16 @@ class TestCore(unittest.TestCase):
             assert_allclose(c_bm.full(), c_full)
             assert not np.may_share_memory(c_bm.data, a_bm.data)
             assert not np.may_share_memory(c_bm.data, b_bm.data)
+
+            c_bm = a_bm - 0
+            c_full = a_full - 0
+            assert_allclose(c_bm.full(), c_full)
+            assert not np.may_share_memory(c_bm.data, a_bm.data)
+
+            c_bm = 0 - a_bm
+            c_full = 0 - a_full
+            assert_allclose(c_bm.full(), c_full)
+            assert not np.may_share_memory(c_bm.data, a_bm.data)
 
             with self.assertRaises(TypeError):
                 a_bm - 1.0
@@ -227,6 +247,11 @@ class TestCore(unittest.TestCase):
                 with self.assertRaises(AssertionError):
                     a_bm += b_bm
 
+            a_bm += 0
+            a_full += 0
+            assert_allclose(a_bm.full(), a_full)
+            assert get_array_mem(a_bm.data, b_bm.data) == array_mem
+
             with self.assertRaises(TypeError):
                 a_bm += 1.0
 
@@ -247,6 +272,11 @@ class TestCore(unittest.TestCase):
             else:
                 with self.assertRaises(AssertionError):
                     a_bm -= b_bm
+
+            a_bm -= 0
+            a_full -= 0
+            assert_allclose(a_bm.full(), a_full)
+            assert get_array_mem(a_bm.data, b_bm.data) == array_mem
 
             with self.assertRaises(TypeError):
                 a_bm -= 1.0
