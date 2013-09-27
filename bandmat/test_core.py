@@ -200,6 +200,20 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(TypeError):
                 1.0 + a_bm
 
+    def test_BandMat_sum(self, its = 50):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            numTerms = randint(10)
+            a_bms = [ gen_BandMat(size) for _ in range(numTerms) ]
+            a_fulls = [ a_bm.full() for a_bm in a_bms ]
+
+            b_bm = sum(a_bms)
+            b_full = sum(a_fulls)
+            if numTerms > 0:
+                assert_allclose(b_bm.full(), b_full)
+            for a_bm in a_bms:
+                assert not np.may_share_memory(b_bm.data, a_bm.data)
+
     def test_BandMat_sub(self, its = 100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
