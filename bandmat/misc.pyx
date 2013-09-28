@@ -11,7 +11,7 @@ cimport cython
 cnp.import_array()
 cnp.import_ufunc()
 
-def fancy_plus_equals(cnp.ndarray[cnp.int64_t, ndim=1] targetIndexSeq,
+def fancy_plus_equals(cnp.ndarray[cnp.int_t, ndim=1] targetIndexSeq,
                       cnp.ndarray[cnp.float64_t, ndim=1] source,
                       cnp.ndarray[cnp.float64_t, ndim=1] target):
     """Implements a += method with fancy indexing.
@@ -34,7 +34,7 @@ def fancy_plus_equals(cnp.ndarray[cnp.int64_t, ndim=1] targetIndexSeq,
 
     return
 
-def fancy_plus_equals_2d(cnp.ndarray[cnp.int64_t, ndim=1] targetIndexSeq,
+def fancy_plus_equals_2d(cnp.ndarray[cnp.int_t, ndim=1] targetIndexSeq,
                          cnp.ndarray[cnp.float64_t, ndim=2] source,
                          cnp.ndarray[cnp.float64_t, ndim=2] target):
     """Implements a += method with fancy indexing.

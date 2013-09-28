@@ -24,9 +24,7 @@ class TestMisc(unittest.TestCase):
             targetSize = random.choice([1, randint(1, 10), randint(1, 100)])
             source = randn(sourceSize)
             target = randn(targetSize)
-            targetIndexSeq = np.array([ randint(targetSize)
-                                        for _ in range(sourceSize) ],
-                                      dtype = np.int64)
+            targetIndexSeq = randint(targetSize, size = sourceSize)
             array_mem = get_array_mem(targetIndexSeq, source, target)
 
             targetGood = target.copy()
@@ -44,9 +42,7 @@ class TestMisc(unittest.TestCase):
             targetSize = random.choice([1, randint(1, 10), randint(1, 100)])
             source = randn(sourceSize)
             target = randn(targetSize)
-            targetIndexSeq = np.array([ randint(targetSize)
-                                        for _ in range(sourceSize) ],
-                                      dtype = np.int64)
+            targetIndexSeq = randint(targetSize, size = sourceSize)
             targetIndexSeq[randint(sourceSize)] = (
                 (-targetSize - 1 - randint(10)) if randBool()
                 else targetSize + randint(10)
@@ -62,9 +58,7 @@ class TestMisc(unittest.TestCase):
             size1 = random.choice([0, 1, randint(10)])
             source = randn(sourceSize, size1)
             target = randn(targetSize, size1)
-            targetIndexSeq = np.array([ randint(targetSize)
-                                        for _ in range(sourceSize) ],
-                                      dtype = np.int64)
+            targetIndexSeq = randint(targetSize, size = sourceSize)
             array_mem = get_array_mem(targetIndexSeq, source, target)
 
             targetGood = target.copy()
@@ -83,9 +77,7 @@ class TestMisc(unittest.TestCase):
             size1 = random.choice([1, randint(1, 10)])
             source = randn(sourceSize, size1)
             target = randn(targetSize, size1)
-            targetIndexSeq = np.array([ randint(targetSize)
-                                        for _ in range(sourceSize) ],
-                                      dtype = np.int64)
+            targetIndexSeq = randint(targetSize, size = sourceSize)
             targetIndexSeq[randint(sourceSize)] = (
                 (-targetSize - 1 - randint(10)) if randBool()
                 else targetSize + randint(10)
