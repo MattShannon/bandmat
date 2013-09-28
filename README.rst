@@ -33,10 +33,8 @@ The bandmat package provides:
   cython.
 - helper functions for converting between full and banded matrix
   representations.
-- certain linear algebra operations on banded matrices.
-- an implementation of a fancy indexed += function for numpy arrays.
-  This is included for (the author's) convenience and is not directly related
-  to banded matrix manipulation.
+- certain linear algebra operations on banded matrices, including computing the
+  band of the inverse of a banded matrix.
 
 Only square banded matrices are supported by this package.
 
