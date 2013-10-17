@@ -20,7 +20,7 @@ def rand_bool():
     return randint(0, 2) == 0
 
 class TestTensor(unittest.TestCase):
-    def test_dot_mv_plus_equals(self, its = 100):
+    def test_dot_mv_plus_equals(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -35,7 +35,7 @@ class TestTensor(unittest.TestCase):
             assert_allclose(c, c_good)
             assert get_array_mem(a_bm.data, b, c) == array_mem
 
-    def test_dot_mv(self, its = 100):
+    def test_dot_mv(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -48,7 +48,7 @@ class TestTensor(unittest.TestCase):
             assert not np.may_share_memory(c, a_bm.data)
             assert not np.may_share_memory(c, b)
 
-    def test_dot_mm_plus_equals(self, its = 50):
+    def test_dot_mm_plus_equals(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -65,7 +65,7 @@ class TestTensor(unittest.TestCase):
             if diag is not None:
                 diag_mem = get_array_mem(diag)
 
-            bm.dot_mm_plus_equals(a_bm, b_bm, c_bm, diag = diag)
+            bm.dot_mm_plus_equals(a_bm, b_bm, c_bm, diag=diag)
             c_full += fl.band_ec(
                 l, u,
                 np.dot(np.dot(a_full, np.diag(diag_value)), b_full)
@@ -75,7 +75,7 @@ class TestTensor(unittest.TestCase):
             if diag is not None:
                 assert get_array_mem(diag) == diag_mem
 
-    def test_dot_mm(self, its = 50):
+    def test_dot_mm(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -85,7 +85,7 @@ class TestTensor(unittest.TestCase):
             a_full = a_bm.full()
             b_full = b_bm.full()
 
-            c_bm = bm.dot_mm(a_bm, b_bm, diag = diag)
+            c_bm = bm.dot_mm(a_bm, b_bm, diag=diag)
             c_full = np.dot(np.dot(a_full, np.diag(diag_value)), b_full)
             assert c_bm.l == a_bm.l + b_bm.l
             assert c_bm.u == a_bm.u + b_bm.u
@@ -96,7 +96,7 @@ class TestTensor(unittest.TestCase):
             if diag is not None:
                 assert not np.may_share_memory(c_bm.data, diag)
 
-    def test_dot_mm_partial(self, its = 50):
+    def test_dot_mm_partial(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -108,7 +108,7 @@ class TestTensor(unittest.TestCase):
             a_full = a_bm.full()
             b_full = b_bm.full()
 
-            c_bm = bm.dot_mm_partial(l, u, a_bm, b_bm, diag = diag)
+            c_bm = bm.dot_mm_partial(l, u, a_bm, b_bm, diag=diag)
             c_full = fl.band_ec(
                 l, u,
                 np.dot(np.dot(a_full, np.diag(diag_value)), b_full)
@@ -122,7 +122,7 @@ class TestTensor(unittest.TestCase):
             if diag is not None:
                 assert not np.may_share_memory(c_bm.data, diag)
 
-    def test_dot_mmm_partial(self, its = 50):
+    def test_dot_mmm_partial(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -144,7 +144,7 @@ class TestTensor(unittest.TestCase):
             assert not np.may_share_memory(d_bm.data, b_bm.data)
             assert not np.may_share_memory(d_bm.data, c_bm.data)
 
-    def test_band_of_outer_plus_equals(self, its = 50):
+    def test_band_of_outer_plus_equals(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_vec = randn(size)
@@ -156,12 +156,12 @@ class TestTensor(unittest.TestCase):
             u = mat_bm.u
             array_mem = get_array_mem(a_vec, b_vec, mat_bm.data)
 
-            bm.band_of_outer_plus_equals(a_vec, b_vec, mat_bm, mult = mult)
+            bm.band_of_outer_plus_equals(a_vec, b_vec, mat_bm, mult=mult)
             mat_full += fl.band_ec(l, u, np.outer(a_vec, b_vec) * mult)
             assert_allclose(mat_bm.full(), mat_full)
             assert get_array_mem(a_vec, b_vec, mat_bm.data) == array_mem
 
-    def test_trace_dot(self, its = 50):
+    def test_trace_dot(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)

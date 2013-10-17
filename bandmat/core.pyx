@@ -44,7 +44,7 @@ class BandMat(object):
     Note that if `transposed` is True, `l` and `u` still refer to the square
     matrix being represented rather than to its transpose.
     """
-    def __init__(self, l, u, data, transposed = False):
+    def __init__(self, l, u, data, transposed=False):
         self.l = l
         self.u = u
         self.data = data
@@ -72,7 +72,7 @@ class BandMat(object):
         The returned BandMat has the same underlying data array as `self`.
         """
         return BandMat(self.u, self.l, self.data,
-                       transposed = not self.transposed)
+                       transposed=not self.transposed)
 
     def full(self):
         """Converts this BandMat to a conventional numpy array.
@@ -108,8 +108,8 @@ class BandMat(object):
         else:
             return BandMat(l, u, self.data.copy())
 
-    def equiv(self, l_new = None, u_new = None, transposed_new = None,
-              zero_extra = False):
+    def equiv(self, l_new=None, u_new=None, transposed_new=None,
+              zero_extra=False):
         """Returns an equivalent BandMat stored differently.
 
         The returned BandMat represents the same matrix as `self`, but has a
@@ -147,12 +147,12 @@ class BandMat(object):
             if zero_extra:
                 fl.zero_extra_entries(ll, uu, data_new_co)
         else:
-            fl.band_cTe(uu, ll, self.data, target_rect = data_new_co)
+            fl.band_cTe(uu, ll, self.data, target_rect=data_new_co)
 
-        return BandMat(l_new, u_new, data_new, transposed = transposed_new)
+        return BandMat(l_new, u_new, data_new, transposed=transposed_new)
 
     @cython.boundscheck(False)
-    def plus_equals_band_of(self, mat_bm, double mult = 1.0):
+    def plus_equals_band_of(self, mat_bm, double mult=1.0):
         """Adds a multiple of a band of another matrix to this matrix in-place.
 
         Any entries of `mat_bm` which lie outside of `self` are ignored.
@@ -225,7 +225,7 @@ class BandMat(object):
             return NotImplemented
 
         assert self.size == other.size
-        c_bm = self.equiv(l_new = max(self.l, other.l),
+        c_bm = self.equiv(l_new=max(self.l, other.l),
                           u_new = max(self.u, other.u))
         c_bm.plus_equals_band_of(other)
         return c_bm
@@ -253,9 +253,9 @@ class BandMat(object):
             return NotImplemented
 
         assert self.size == other.size
-        c_bm = self.equiv(l_new = max(self.l, other.l),
+        c_bm = self.equiv(l_new=max(self.l, other.l),
                           u_new = max(self.u, other.u))
-        c_bm.plus_equals_band_of(other, mult = -1.0)
+        c_bm.plus_equals_band_of(other, mult=-1.0)
         return c_bm
 
     def __rsub__(self, other):
@@ -305,7 +305,7 @@ class BandMat(object):
         assert self.l >= other.l
         assert self.u >= other.u
 
-        self.plus_equals_band_of(other, mult = -1.0)
+        self.plus_equals_band_of(other, mult=-1.0)
         return self
 
     def __pos__(self):
@@ -318,7 +318,7 @@ class BandMat(object):
         where `a_full` is a square numpy array.
         """
         return BandMat(self.l, self.u, +self.data,
-                       transposed = self.transposed)
+                       transposed=self.transposed)
 
     def __neg__(self):
         """Take the negative of a banded matrix.
@@ -330,7 +330,7 @@ class BandMat(object):
         where `a_full` is a square numpy array.
         """
         return BandMat(self.l, self.u, -self.data,
-                       transposed = self.transposed)
+                       transposed=self.transposed)
 
     def __mul__(self, other):
         """Multiplies a banded matrix by a scalar.
@@ -348,7 +348,7 @@ class BandMat(object):
             return NotImplemented
 
         return BandMat(self.l, self.u, self.data * mult,
-                       transposed = self.transposed)
+                       transposed=self.transposed)
 
     def __rmul__(self, other):
         return self.__mul__(other)
@@ -499,7 +499,7 @@ class BandMat(object):
         where `a_full` is a square numpy array.
         """
         return BandMat(self.u, self.l, self.data[::-1, ::-1],
-                       transposed = self.transposed)
+                       transposed=self.transposed)
 
     def sub_matrix_view(self, start, end):
         """Returns a sub-matrix of this matrix.
@@ -517,7 +517,7 @@ class BandMat(object):
         """
         assert 0 <= start <= end <= self.size
         return BandMat(self.l, self.u, self.data[:, start:end],
-                       transposed = self.transposed)
+                       transposed=self.transposed)
 
     def embed_as_sub_matrix(self, start, size):
         """Returns a new matrix containing this matrix as a sub-matrix.
@@ -542,7 +542,7 @@ class BandMat(object):
         data[:, start:end] = self.data
         data[:, end:size] = 0.0
         fl.zero_extra_entries(ll, uu, data[:, start:end])
-        return BandMat(self.l, self.u, data, transposed = self.transposed)
+        return BandMat(self.l, self.u, data, transposed=self.transposed)
 
 def zeros(l, u, size):
     """Returns the zero matrix as a BandMat.
@@ -592,9 +592,9 @@ def band_e_bm(l, u, mat_bm):
     where `mat_full` is a square numpy array.
     """
     mat_bm_co = band_ec_bm_view(l, u, mat_bm)
-    mat_bm_new = mat_bm_co.equiv(l_new = l, u_new = u,
-                                 transposed_new = False,
-                                 zero_extra = True)
+    mat_bm_new = mat_bm_co.equiv(l_new=l, u_new=u,
+                                 transposed_new=False,
+                                 zero_extra=True)
     return mat_bm_new.data
 
 band_ce_bm = fl.band_ce

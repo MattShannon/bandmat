@@ -15,7 +15,7 @@ import random
 from numpy.random import randn, randint
 
 class TestFull(unittest.TestCase):
-    def test_band_c_basis(self, its = 100):
+    def test_band_c_basis(self, its=100):
         """Checks band_c behaves correctly on canonical basis matrices."""
         for it in range(its):
             l = random.choice([0, 1, randint(0, 10)])
@@ -38,7 +38,7 @@ class TestFull(unittest.TestCase):
 
             assert_allequal(mat_full, mat_full_good)
 
-    def test_band_c_linear(self, its = 100):
+    def test_band_c_linear(self, its=100):
         """Checks band_c is linear."""
         for it in range(its):
             l = random.choice([0, 1, randint(0, 10)])
@@ -65,7 +65,7 @@ class TestFull(unittest.TestCase):
             mat_full = fl.band_c(l, u, mat_rect)
             assert not np.may_share_memory(mat_full, mat_rect)
 
-    def test_band_e_basis(self, its = 100):
+    def test_band_e_basis(self, its=100):
         """Checks band_e behaves correctly on canonical basis matrices."""
         for it in range(its):
             l = random.choice([0, 1, randint(0, 10)])
@@ -88,7 +88,7 @@ class TestFull(unittest.TestCase):
 
             assert_allequal(mat_rect, mat_rect_good)
 
-    def test_band_e_linear(self, its = 100):
+    def test_band_e_linear(self, its=100):
         """Checks band_e is linear."""
         for it in range(its):
             l = random.choice([0, 1, randint(0, 10)])
@@ -115,7 +115,7 @@ class TestFull(unittest.TestCase):
             mat_rect = fl.band_e(l, u, mat_full)
             assert not np.may_share_memory(mat_rect, mat_full)
 
-    def test_zero_extra_entries(self, its = 100):
+    def test_zero_extra_entries(self, its=100):
         """Checks zero_extra_entries against its equivalent definition."""
         for it in range(its):
             l = random.choice([0, 1, randint(0, 10)])
@@ -130,7 +130,7 @@ class TestFull(unittest.TestCase):
             assert_allequal(mat_rect, mat_rect_good)
             assert get_array_mem(mat_rect) == array_mem
 
-    def test_band_ce(self, its = 100):
+    def test_band_ce(self, its=100):
         """Checks band_ce against its definition and required properties."""
         for it in range(its):
             l = random.choice([0, 1, randint(0, 10)])
@@ -149,7 +149,7 @@ class TestFull(unittest.TestCase):
                 mat_rect_new
             )
 
-    def test_band_ec(self, its = 100):
+    def test_band_ec(self, its=100):
         """Checks band_ec against its definition and required properties."""
         for it in range(its):
             l = random.choice([0, 1, randint(0, 10)])
@@ -168,7 +168,7 @@ class TestFull(unittest.TestCase):
                 mat_full_new
             )
 
-    def test_band_cTe(self, its = 100):
+    def test_band_cTe(self, its=100):
         """Checks band_cTe against its definition and required properties."""
         for it in range(its):
             l = random.choice([0, 1, randint(0, 10)])
@@ -190,7 +190,7 @@ class TestFull(unittest.TestCase):
             # check version that uses pre-specified target
             mat_rect_new2 = np.empty((l + u + 1, size))
             array_mem = get_array_mem(mat_rect, mat_rect_new2)
-            ret = fl.band_cTe(l, u, mat_rect, target_rect = mat_rect_new2)
+            ret = fl.band_cTe(l, u, mat_rect, target_rect=mat_rect_new2)
             self.assertIsNone(ret)
             assert_allequal(mat_rect_new2, mat_rect_new)
             assert get_array_mem(mat_rect, mat_rect_new2) == array_mem

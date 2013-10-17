@@ -22,15 +22,15 @@ from numpy.random import randn, randint
 def rand_bool():
     return randint(0, 2) == 0
 
-def gen_symmetric_BandMat(size, depth = None):
+def gen_symmetric_BandMat(size, depth=None):
     if depth is None:
         depth = random.choice([0, 1, randint(0, 10)])
-    a_bm = gen_BandMat(size, l = depth, u = depth)
+    a_bm = gen_BandMat(size, l=depth, u=depth)
     b_bm = a_bm + a_bm.T
     randomize_extra_entries_bm(b_bm)
     return b_bm
 
-def gen_pos_def_BandMat(size, depth = None, contrib_rank = 2):
+def gen_pos_def_BandMat(size, depth=None, contrib_rank=2):
     """Generates a random positive definite BandMat."""
     assert contrib_rank >= 0
     if depth is None:
@@ -38,7 +38,7 @@ def gen_pos_def_BandMat(size, depth = None, contrib_rank = 2):
     mat_bm = bm.zeros(depth, depth, size)
     for _ in range(contrib_rank):
         diff = randint(0, depth + 1)
-        chol_bm = gen_BandMat(size, l = depth - diff, u = diff)
+        chol_bm = gen_BandMat(size, l=depth - diff, u=diff)
         bm.dot_mm_plus_equals(chol_bm, chol_bm.T, mat_bm)
     transposed = rand_bool()
     if transposed:
@@ -46,16 +46,15 @@ def gen_pos_def_BandMat(size, depth = None, contrib_rank = 2):
     randomize_extra_entries_bm(mat_bm)
     return mat_bm
 
-def gen_chol_factor_BandMat(size, depth = None, contrib_rank = 2):
+def gen_chol_factor_BandMat(size, depth=None, contrib_rank=2):
     """Generates a random Cholesky factor BandMat.
 
     This works by generating a random positive definite matrix and then
     computing its Cholesky factor, since using a random matrix as a Cholesky
     factor seems to often lead to ill-conditioned matrices.
     """
-    mat_bm = gen_pos_def_BandMat(size, depth = depth,
-                                 contrib_rank = contrib_rank)
-    chol_bm = bla.cholesky(mat_bm, lower = rand_bool())
+    mat_bm = gen_pos_def_BandMat(size, depth=depth, contrib_rank=contrib_rank)
+    chol_bm = bla.cholesky(mat_bm, lower=rand_bool())
     if rand_bool():
         chol_bm = chol_bm.T
     assert chol_bm.l == 0 or chol_bm.u == 0
@@ -64,7 +63,7 @@ def gen_chol_factor_BandMat(size, depth = None, contrib_rank = 2):
     return chol_bm
 
 class TestLinAlg(unittest.TestCase):
-    def test_cholesky(self, its = 50):
+    def test_cholesky(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mat_bm = gen_pos_def_BandMat(size)
@@ -72,8 +71,8 @@ class TestLinAlg(unittest.TestCase):
             lower = rand_bool()
             alternative = rand_bool()
 
-            chol_bm = bla.cholesky(mat_bm, lower = lower,
-                                   alternative = alternative)
+            chol_bm = bla.cholesky(mat_bm, lower=lower,
+                                   alternative=alternative)
             assert chol_bm.l == (depth if lower else 0)
             assert chol_bm.u == (0 if lower else depth)
             assert not np.may_share_memory(chol_bm.data, mat_bm.data)
@@ -84,7 +83,7 @@ class TestLinAlg(unittest.TestCase):
                 mat_bm_again = bm.dot_mm(chol_bm.T, chol_bm)
             assert_allclose(mat_bm_again.full(), mat_bm.full())
 
-    def test_cho_solve(self, its = 50):
+    def test_cho_solve(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             b = randn(size)
@@ -102,7 +101,7 @@ class TestLinAlg(unittest.TestCase):
             assert not np.may_share_memory(x, chol_bm.data)
             assert not np.may_share_memory(x, b)
 
-    def test_solve(self, its = 50):
+    def test_solve(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             b = randn(size)
@@ -119,7 +118,7 @@ class TestLinAlg(unittest.TestCase):
             assert not np.may_share_memory(x, a_bm.data)
             assert not np.may_share_memory(x, b)
 
-    def test_solveh(self, its = 50):
+    def test_solveh(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             b = randn(size)
@@ -130,12 +129,12 @@ class TestLinAlg(unittest.TestCase):
             if size == 0:
                 x_good = np.zeros((size,))
             else:
-                x_good = sla.solve(a_full, b, sym_pos = True)
+                x_good = sla.solve(a_full, b, sym_pos=True)
             assert_allclose(x, x_good)
             assert not np.may_share_memory(x, a_bm.data)
             assert not np.may_share_memory(x, b)
 
-    def test_band_of_inverse_from_chol(self, its = 50):
+    def test_band_of_inverse_from_chol(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             chol_bm = gen_chol_factor_BandMat(size)
@@ -152,7 +151,7 @@ class TestLinAlg(unittest.TestCase):
             )
             assert_allclose(band_of_inv_bm.full(), band_of_inv_full_good)
 
-    def test_band_of_inverse(self, its = 50):
+    def test_band_of_inverse(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mat_bm = gen_pos_def_BandMat(size)

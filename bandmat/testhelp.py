@@ -3,8 +3,8 @@
 import numpy as np
 from numpy.random import randn
 
-def assert_allclose(actual, desired, rtol = 1e-7, atol = 1e-14,
-                    msg = 'items not almost equal'):
+def assert_allclose(actual, desired, rtol=1e-7, atol=1e-14,
+                    msg='items not almost equal'):
     if np.shape(actual) != np.shape(desired):
         raise AssertionError('%s (wrong shape)\n ACTUAL:  %r\n DESIRED: %r' %
                              (msg, actual, desired))
@@ -17,7 +17,7 @@ def assert_allclose(actual, desired, rtol = 1e-7, atol = 1e-14,
                               abs_err, np.max(abs_err),
                               rel_err, np.max(rel_err)))
 
-def assert_allequal(actual, desired, msg = 'items not equal'):
+def assert_allequal(actual, desired, msg='items not equal'):
     if np.shape(actual) != np.shape(desired):
         raise AssertionError('%s (wrong shape)\n ACTUAL:  %r\n DESIRED: %r' %
                              (msg, actual, desired))

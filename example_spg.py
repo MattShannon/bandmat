@@ -50,7 +50,7 @@ def build_win_mats(windows, frames):
 
     return win_mats
 
-def build_poe(b_frames, tau_frames, win_mats, sdw = None):
+def build_poe(b_frames, tau_frames, win_mats, sdw=None):
     r"""Computes natural parameters for a Gaussian product-of-experts model.
 
     The natural parameters (b-value vector and precision matrix) are returned.
@@ -81,9 +81,9 @@ def build_poe(b_frames, tau_frames, win_mats, sdw = None):
     prec = bm.zeros(sdw, sdw, frames)
 
     for win_index, win_mat in enumerate(win_mats):
-        bm.dot_mv_plus_equals(win_mat.T, b_frames[:, win_index], target = b)
-        bm.dot_mm_plus_equals(win_mat.T, win_mat, target_bm = prec,
-                              diag = tau_frames[:, win_index])
+        bm.dot_mv_plus_equals(win_mat.T, b_frames[:, win_index], target=b)
+        bm.dot_mm_plus_equals(win_mat.T, win_mat, target_bm=prec,
+                              diag=tau_frames[:, win_index])
 
     return b, prec
 

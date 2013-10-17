@@ -18,7 +18,7 @@ from numpy.random import randn, randint
 def rand_bool():
     return randint(0, 2) == 0
 
-def gen_array(ranks = [0, 1, 2, 3]):
+def gen_array(ranks=[0, 1, 2, 3]):
     rank = random.choice(ranks)
     shape = tuple([ randint(5) for _ in range(rank) ])
     return np.asarray(randn(*shape))
@@ -29,7 +29,7 @@ def gen_BandMat_simple(size):
     u = random.choice([0, 1, randint(0, 10)])
     data = randn(l + u + 1, size)
     transposed = rand_bool()
-    return bm.BandMat(l, u, data, transposed = transposed)
+    return bm.BandMat(l, u, data, transposed=transposed)
 
 def load_tests(loader, tests, ignore):
     tests.addTests(doctest.DocTestSuite(th))
@@ -60,7 +60,7 @@ class TestTestHelp(unittest.TestCase):
         self.assertRaises(AssertionError, th.assert_allequal, a0, a3)
         self.assertRaises(AssertionError, th.assert_allequal, a0, a4)
 
-    def test_randomize_extra_entries(self, its = 50):
+    def test_randomize_extra_entries(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             l = random.choice([0, 1, randint(0, 10)])
@@ -78,7 +78,7 @@ class TestTestHelp(unittest.TestCase):
             fl.zero_extra_entries(l, u, mat_rect)
             assert np.all(mat_rect == 0.0)
 
-    def test_randomize_extra_entries_bm(self, its = 50):
+    def test_randomize_extra_entries_bm(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mat_bm = gen_BandMat_simple(size)
@@ -87,7 +87,7 @@ class TestTestHelp(unittest.TestCase):
             th.randomize_extra_entries_bm(mat_bm)
             th.assert_allequal(mat_bm.full(), mat_full)
 
-    def test_get_array_mem(self, its = 50):
+    def test_get_array_mem(self, its=50):
         # (FIXME : these are not great tests, since not familiar enough with
         #   numpy internals to know what sorts of changes in memory layout are
         #   possible and how they might arise in a realistic program)
@@ -102,7 +102,7 @@ class TestTestHelp(unittest.TestCase):
             x.shape = x.shape + (1,)
             assert th.get_array_mem(x) != array_mem
 
-            x = gen_array(ranks = [1, 2, 3])
+            x = gen_array(ranks=[1, 2, 3])
             array_mem = th.get_array_mem(x)
             shape = x.shape
             strides = x.strides

@@ -79,7 +79,7 @@ def dot_mv(a_bm, b):
 
 @cython.boundscheck(False)
 def dot_mm_plus_equals(a_bm, b_bm, target_bm,
-                       cnp.ndarray[cnp.float64_t, ndim=1] diag = None):
+                       cnp.ndarray[cnp.float64_t, ndim=1] diag=None):
     """Multiplies two banded matrices, adding the result to a banded matrix.
 
     If `diag` is None, computes A . B, where . indicates matrix multiplication,
@@ -171,7 +171,7 @@ def dot_mm_plus_equals(a_bm, b_bm, target_bm,
 
     return
 
-def dot_mm(a_bm, b_bm, diag = None):
+def dot_mm(a_bm, b_bm, diag=None):
     """Multiplies two banded matrices.
 
     If `diag` is None, computes A . B, where . indicates matrix multiplication.
@@ -190,10 +190,10 @@ def dot_mm(a_bm, b_bm, diag = None):
     """
     assert a_bm.size == b_bm.size
     c_bm = bm_core.zeros(a_bm.l + b_bm.l, a_bm.u + b_bm.u, a_bm.size)
-    dot_mm_plus_equals(a_bm, b_bm, c_bm, diag = diag)
+    dot_mm_plus_equals(a_bm, b_bm, c_bm, diag=diag)
     return c_bm
 
-def dot_mm_partial(l, u, a_bm, b_bm, diag = None):
+def dot_mm_partial(l, u, a_bm, b_bm, diag=None):
     """Computes part of the result of multiplying two banded matrices.
 
     If `diag` is None, computes part of C = A . B, where . indicates matrix
@@ -217,7 +217,7 @@ def dot_mm_partial(l, u, a_bm, b_bm, diag = None):
     """
     assert a_bm.size == b_bm.size
     c_bm = bm_core.zeros(l, u, a_bm.size)
-    dot_mm_plus_equals(a_bm, b_bm, c_bm, diag = diag)
+    dot_mm_plus_equals(a_bm, b_bm, c_bm, diag=diag)
     return c_bm
 
 def dot_mmm_partial(l, u, a_bm, b_bm, c_bm):
@@ -248,7 +248,7 @@ def dot_mmm_partial(l, u, a_bm, b_bm, c_bm):
 def band_of_outer_plus_equals(cnp.ndarray[cnp.float64_t, ndim=1] a_vec,
                               cnp.ndarray[cnp.float64_t, ndim=1] b_vec,
                               target_bm,
-                              double mult = 1.0):
+                              double mult=1.0):
     """Adds the band of the outer product of two vectors to a banded matrix.
 
     The statement `band_of_outer_plus_equals(a_vec, b_vec, target_bm, mult)`

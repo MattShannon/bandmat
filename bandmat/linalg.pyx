@@ -29,7 +29,7 @@ cimport cython
 cnp.import_array()
 cnp.import_ufunc()
 
-def cholesky(mat_bm, lower = False, alternative = False):
+def cholesky(mat_bm, lower=False, alternative=False):
     """Computes the Cholesky factor of a positive definite banded matrix.
 
     The conventional Cholesky decomposition of a positive definite matrix P is
@@ -76,9 +76,9 @@ def cholesky(mat_bm, lower = False, alternative = False):
         mat_half_data = mat_bm.data[(depth - u):(depth + l + 1)]
         if alternative:
             chol_data = sla.cholesky_banded(mat_half_data[::-1, ::-1],
-                                            lower = not lower)[::-1, ::-1]
+                                            lower=(not lower))[::-1, ::-1]
         else:
-            chol_data = sla.cholesky_banded(mat_half_data, lower = lower)
+            chol_data = sla.cholesky_banded(mat_half_data, lower=lower)
         chol_bm = BandMat(l, u, chol_data)
 
     return chol_bm
@@ -114,7 +114,7 @@ def solve(a_bm, b):
     #   dgbtrs does have a transpose flag, so LAPACK is capable of working with
     #   the transposed matrix directly in principle).
     if a_bm.transposed:
-        a_bm = a_bm.equiv(transposed_new = False)
+        a_bm = a_bm.equiv(transposed_new=False)
 
     if a_bm.size == 0:
         x = np.zeros_like(b)
@@ -151,7 +151,7 @@ def solveh(a_bm, b):
         x = np.zeros_like(b)
     else:
         a_half_data = a_bm.data[(depth - u):(depth + l + 1)]
-        x = sla.solveh_banded(a_half_data, b, lower = lower)
+        x = sla.solveh_banded(a_half_data, b, lower=lower)
     return x
 
 @cython.boundscheck(False)
@@ -225,6 +225,6 @@ def band_of_inverse(mat_bm):
     """Computes band of the inverse of a positive definite banded matrix."""
     depth = mat_bm.l
     assert mat_bm.u == depth
-    chol_bm = cholesky(mat_bm, lower = True)
+    chol_bm = cholesky(mat_bm, lower=True)
     band_of_inv_bm = band_of_inverse_from_chol(chol_bm)
     return band_of_inv_bm

@@ -48,13 +48,13 @@ else:
                     for loc in cython_locs ]
 
 setup(
-    name = 'bandmat',
-    version = '0.4.dev1',
-    description = 'A banded matrix library for python.',
-    url = 'http://github.com/MattShannon/bandmat',
-    author = 'Matt Shannon',
-    author_email = 'matt.shannon@cantab.net',
-    license = '3-clause BSD (see License file)',
+    name='bandmat',
+    version='0.4.dev1',
+    description='A banded matrix library for python.',
+    url='http://github.com/MattShannon/bandmat',
+    author='Matt Shannon',
+    author_email='matt.shannon@cantab.net',
+    license='3-clause BSD (see License file)',
     packages = ['bandmat'],
     long_description = long_description,
     cmdclass = cmdclass,

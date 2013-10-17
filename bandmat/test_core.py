@@ -19,7 +19,7 @@ from numpy.random import randn, randint
 def rand_bool():
     return randint(0, 2) == 0
 
-def gen_BandMat(size, l = None, u = None, transposed = None):
+def gen_BandMat(size, l=None, u=None, transposed=None):
     """Generates a random BandMat."""
     if l is None:
         l = random.choice([0, 1, randint(0, 10)])
@@ -28,7 +28,7 @@ def gen_BandMat(size, l = None, u = None, transposed = None):
     data = randn(l + u + 1, size)
     if transposed is None:
         transposed = rand_bool()
-    return bm.BandMat(l, u, data, transposed = transposed)
+    return bm.BandMat(l, u, data, transposed=transposed)
 
 def load_tests(loader, tests, ignore):
     # package-level doctests (N.B. includes other modules, not just core)
@@ -37,14 +37,14 @@ def load_tests(loader, tests, ignore):
     return tests
 
 class TestCore(unittest.TestCase):
-    def test_BandMat_basic(self, its = 50):
+    def test_BandMat_basic(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
 
             assert a_bm.size == size
 
-    def test_BandMat_full(self, its = 50):
+    def test_BandMat_full(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -63,7 +63,7 @@ class TestCore(unittest.TestCase):
 
             assert not np.may_share_memory(a_full, a_bm.data)
 
-    def test_BandMat_T(self, its = 50):
+    def test_BandMat_T(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -74,7 +74,7 @@ class TestCore(unittest.TestCase):
             if size > 0:
                 assert np.may_share_memory(a_bm.T.data, a_bm.data)
 
-    def test_BandMat_copy_exact(self, its = 50):
+    def test_BandMat_copy_exact(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mat_bm = gen_BandMat(size)
@@ -95,7 +95,7 @@ class TestCore(unittest.TestCase):
             mat_bm_new.data += 1.0
             assert_allequal(mat_bm.full(), mat_full_orig)
 
-    def test_BandMat_copy(self, its = 50):
+    def test_BandMat_copy(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mat_bm = gen_BandMat(size)
@@ -116,7 +116,7 @@ class TestCore(unittest.TestCase):
             mat_bm_new.data += 1.0
             assert_allequal(mat_bm.full(), mat_full_orig)
 
-    def test_BandMat_equiv(self, its = 50):
+    def test_BandMat_equiv(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mat_bm = gen_BandMat(size)
@@ -133,13 +133,13 @@ class TestCore(unittest.TestCase):
             if l_new_value < mat_bm.l or u_new_value < mat_bm.u:
                 self.assertRaises(AssertionError,
                                   mat_bm.equiv,
-                                  l_new = l_new, u_new = u_new,
-                                  transposed_new = transposed_new,
-                                  zero_extra = zero_extra)
+                                  l_new=l_new, u_new=u_new,
+                                  transposed_new=transposed_new,
+                                  zero_extra=zero_extra)
             else:
-                mat_bm_new = mat_bm.equiv(l_new = l_new, u_new = u_new,
-                                          transposed_new = transposed_new,
-                                          zero_extra = zero_extra)
+                mat_bm_new = mat_bm.equiv(l_new=l_new, u_new=u_new,
+                                          transposed_new=transposed_new,
+                                          zero_extra=zero_extra)
                 assert mat_bm_new.l == l_new_value
                 assert mat_bm_new.u == u_new_value
                 assert mat_bm_new.transposed == transposed_new_value
@@ -154,7 +154,7 @@ class TestCore(unittest.TestCase):
                     )
                     assert_allequal(mat_bm_new.data, mat_new_data_good)
 
-    def test_BandMat_plus_equals_band_of(self, its = 100):
+    def test_BandMat_plus_equals_band_of(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mult = randn()
@@ -171,7 +171,7 @@ class TestCore(unittest.TestCase):
             assert_allclose(target_bm.full(), target_full)
             assert get_array_mem(target_bm.data, mat_bm.data) == array_mem
 
-    def test_BandMat_add(self, its = 100):
+    def test_BandMat_add(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -200,7 +200,7 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(TypeError):
                 1.0 + a_bm
 
-    def test_BandMat_sum(self, its = 50):
+    def test_BandMat_sum(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             num_terms = randint(10)
@@ -214,7 +214,7 @@ class TestCore(unittest.TestCase):
             for a_bm in a_bms:
                 assert not np.may_share_memory(b_bm.data, a_bm.data)
 
-    def test_BandMat_sub(self, its = 100):
+    def test_BandMat_sub(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -243,7 +243,7 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(TypeError):
                 1.0 - a_bm
 
-    def test_BandMat_iadd(self, its = 100):
+    def test_BandMat_iadd(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -269,7 +269,7 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(TypeError):
                 a_bm += 1.0
 
-    def test_BandMat_isub(self, its = 100):
+    def test_BandMat_isub(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -295,7 +295,7 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(TypeError):
                 a_bm -= 1.0
 
-    def test_BandMat_pos(self, its = 100):
+    def test_BandMat_pos(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -306,7 +306,7 @@ class TestCore(unittest.TestCase):
             assert_allclose(b_bm.full(), b_full)
             assert not np.may_share_memory(b_bm.data, a_bm.data)
 
-    def test_BandMat_neg(self, its = 100):
+    def test_BandMat_neg(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -317,7 +317,7 @@ class TestCore(unittest.TestCase):
             assert_allclose(b_bm.full(), b_full)
             assert not np.may_share_memory(b_bm.data, a_bm.data)
 
-    def test_BandMat_mul_and_rmul(self, its = 100):
+    def test_BandMat_mul_and_rmul(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mult = randn()
@@ -341,7 +341,7 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(TypeError):
                 a_bm * a_bm
 
-    def test_BandMat_various_divs(self, its = 100):
+    def test_BandMat_various_divs(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mult = randn()
@@ -392,7 +392,7 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(TypeError):
                 1.0 / a_bm
 
-    def test_BandMat_imul(self, its = 100):
+    def test_BandMat_imul(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mult = randn()
@@ -408,7 +408,7 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(TypeError):
                 a_bm *= a_bm
 
-    def test_BandMat_various_idivs(self, its = 100):
+    def test_BandMat_various_idivs(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mult = randn()
@@ -458,7 +458,7 @@ class TestCore(unittest.TestCase):
             with self.assertRaises(TypeError):
                 a_bm /= a_bm
 
-    def test_BandMat_reverse_view(self, its = 100):
+    def test_BandMat_reverse_view(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -471,7 +471,7 @@ class TestCore(unittest.TestCase):
             if size > 0:
                 assert np.may_share_memory(b_bm.data, a_bm.data)
 
-    def test_BandMat_sub_matrix_view(self, its = 100):
+    def test_BandMat_sub_matrix_view(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             start = randint(size + 1)
@@ -488,7 +488,7 @@ class TestCore(unittest.TestCase):
             if end > start:
                 assert np.may_share_memory(b_bm.data, a_bm.data)
 
-    def test_BandMat_embed_as_sub_matrix(self, its = 100):
+    def test_BandMat_embed_as_sub_matrix(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             start = randint(size + 1)
@@ -504,7 +504,7 @@ class TestCore(unittest.TestCase):
             assert_allclose(b_bm.full(), b_full)
             assert not np.may_share_memory(b_bm.data, a_bm.data)
 
-    def test_zeros(self, its = 50):
+    def test_zeros(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             l = random.choice([0, 1, randint(0, 10)])
@@ -515,7 +515,7 @@ class TestCore(unittest.TestCase):
             assert mat_bm.u == u
             assert_allequal(mat_bm.full(), np.zeros((size, size)))
 
-    def test_from_full(self, its = 50):
+    def test_from_full(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             l = random.choice([0, 1, randint(0, 10)])
@@ -532,7 +532,7 @@ class TestCore(unittest.TestCase):
             else:
                 self.assertRaises(AssertionError, bm.from_full, l, u, mat_full)
 
-    def test_band_c_bm(self, its = 50):
+    def test_band_c_bm(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             l = random.choice([0, 1, randint(0, 10)])
@@ -545,7 +545,7 @@ class TestCore(unittest.TestCase):
             assert_allequal(mat_bm.full(), mat_full_good)
             assert not np.may_share_memory(mat_bm.data, mat_rect)
 
-    def test_band_e_bm(self, its = 50):
+    def test_band_e_bm(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mat_bm = gen_BandMat(size)
@@ -558,7 +558,7 @@ class TestCore(unittest.TestCase):
             assert_allequal(mat_rect, mat_rect_good)
             assert not np.may_share_memory(mat_rect, mat_bm.data)
 
-    def test_band_ec_bm_view(self, its = 50):
+    def test_band_ec_bm_view(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -573,7 +573,7 @@ class TestCore(unittest.TestCase):
             if size > 0:
                 assert np.may_share_memory(b_bm.data, a_bm.data)
 
-    def test_band_ec_bm(self, its = 50):
+    def test_band_ec_bm(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
@@ -586,7 +586,7 @@ class TestCore(unittest.TestCase):
             assert_allequal(b_bm.full(), b_full_good)
             assert not np.may_share_memory(b_bm.data, a_bm.data)
 
-    def test_band_e_bm_common(self, its = 50):
+    def test_band_e_bm_common(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             num_bms = randint(5)
@@ -599,7 +599,7 @@ class TestCore(unittest.TestCase):
             for mat_bm, mat_rect in zip(mat_bms, mat_rects):
                 assert_allclose(mat_rect, bm.band_e_bm(l, u, mat_bm))
 
-    def test_diag(self, its = 50):
+    def test_diag(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
 

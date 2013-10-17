@@ -158,7 +158,7 @@ def band_ec(l, u, mat_full):
 @cython.boundscheck(False)
 def band_cTe(long l, long u,
              cnp.ndarray[cnp.float64_t, ndim=2] mat_rect,
-             cnp.ndarray[cnp.float64_t, ndim=2] target_rect = None):
+             cnp.ndarray[cnp.float64_t, ndim=2] target_rect=None):
     """Effectively applies `band_c` then transpose then `band_e`.
 
     The expression `band_cTe(l, u, mat_rect)` is equivalent to:

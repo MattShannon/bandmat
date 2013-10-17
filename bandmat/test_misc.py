@@ -18,13 +18,13 @@ def rand_bool():
     return randint(0, 2) == 0
 
 class TestMisc(unittest.TestCase):
-    def test_fancy_plus_equals(self, its = 100):
+    def test_fancy_plus_equals(self, its=100):
         for it in range(its):
             source_size = random.choice([0, 1, randint(10), randint(100)])
             target_size = random.choice([1, randint(1, 10), randint(1, 100)])
             source = randn(source_size)
             target = randn(target_size)
-            target_index_seq = randint(target_size, size = source_size)
+            target_index_seq = randint(target_size, size=source_size)
             array_mem = get_array_mem(target_index_seq, source, target)
 
             target_good = target.copy()
@@ -36,13 +36,13 @@ class TestMisc(unittest.TestCase):
             assert_allclose(target, target_good)
             assert get_array_mem(target_index_seq, source, target) == array_mem
 
-    def test_fancy_plus_equals_fails(self, its = 100):
+    def test_fancy_plus_equals_fails(self, its=100):
         for it in range(its):
             source_size = random.choice([1, randint(1, 10), randint(1, 100)])
             target_size = random.choice([1, randint(1, 10), randint(1, 100)])
             source = randn(source_size)
             target = randn(target_size)
-            target_index_seq = randint(target_size, size = source_size)
+            target_index_seq = randint(target_size, size=source_size)
             target_index_seq[randint(source_size)] = (
                 (-target_size - 1 - randint(10)) if rand_bool()
                 else target_size + randint(10)
@@ -51,14 +51,14 @@ class TestMisc(unittest.TestCase):
                               fancy_plus_equals,
                               target_index_seq, source, target)
 
-    def test_fancy_plus_equals_2d(self, its = 100):
+    def test_fancy_plus_equals_2d(self, its=100):
         for it in range(its):
             source_size = random.choice([0, 1, randint(10), randint(100)])
             target_size = random.choice([1, randint(1, 10), randint(1, 100)])
             size1 = random.choice([0, 1, randint(10)])
             source = randn(source_size, size1)
             target = randn(target_size, size1)
-            target_index_seq = randint(target_size, size = source_size)
+            target_index_seq = randint(target_size, size=source_size)
             array_mem = get_array_mem(target_index_seq, source, target)
 
             target_good = target.copy()
@@ -70,14 +70,14 @@ class TestMisc(unittest.TestCase):
             assert_allclose(target, target_good)
             assert get_array_mem(target_index_seq, source, target) == array_mem
 
-    def test_fancy_plus_equals_2d_fails(self, its = 100):
+    def test_fancy_plus_equals_2d_fails(self, its=100):
         for it in range(its):
             source_size = random.choice([1, randint(1, 10), randint(1, 100)])
             target_size = random.choice([1, randint(1, 10), randint(1, 100)])
             size1 = random.choice([1, randint(1, 10)])
             source = randn(source_size, size1)
             target = randn(target_size, size1)
-            target_index_seq = randint(target_size, size = source_size)
+            target_index_seq = randint(target_size, size=source_size)
             target_index_seq[randint(source_size)] = (
                 (-target_size - 1 - randint(10)) if rand_bool()
                 else target_size + randint(10)
