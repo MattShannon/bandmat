@@ -1,6 +1,11 @@
 #!/usr/bin/python
 """A simple example of how the bandmat package may be used."""
 
+# Copyright 2013 Matt Shannon
+
+# This file is part of bandmat.
+# See `License` for details of license and warranty.
+
 import numpy as np
 import bandmat as bm
 
