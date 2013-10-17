@@ -15,7 +15,7 @@ import numpy as np
 import random
 from numpy.random import randn, randint
 
-def randBool():
+def rand_bool():
     return randint(0, 2) == 0
 
 def gen_array(ranks = [0, 1, 2, 3]):
@@ -28,7 +28,7 @@ def gen_BandMat_simple(size):
     l = random.choice([0, 1, randint(0, 10)])
     u = random.choice([0, 1, randint(0, 10)])
     data = randn(l + u + 1, size)
-    transposed = randBool()
+    transposed = rand_bool()
     return bm.BandMat(l, u, data, transposed = transposed)
 
 def load_tests(loader, tests, ignore):

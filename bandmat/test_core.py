@@ -16,7 +16,7 @@ import numpy as np
 import random
 from numpy.random import randn, randint
 
-def randBool():
+def rand_bool():
     return randint(0, 2) == 0
 
 def gen_BandMat(size, l = None, u = None, transposed = None):
@@ -27,7 +27,7 @@ def gen_BandMat(size, l = None, u = None, transposed = None):
         u = random.choice([0, 1, randint(0, 10)])
     data = randn(l + u + 1, size)
     if transposed is None:
-        transposed = randBool()
+        transposed = rand_bool()
     return bm.BandMat(l, u, data, transposed = transposed)
 
 def load_tests(loader, tests, ignore):
@@ -123,7 +123,7 @@ class TestCore(unittest.TestCase):
             l_new = random.choice([None, 0, 1, randint(0, 10)])
             u_new = random.choice([None, 0, 1, randint(0, 10)])
             transposed_new = random.choice([None, True, False])
-            zero_extra = randBool()
+            zero_extra = rand_bool()
 
             l_new_value = mat_bm.l if l_new is None else l_new
             u_new_value = mat_bm.u if u_new is None else u_new
@@ -203,13 +203,13 @@ class TestCore(unittest.TestCase):
     def test_BandMat_sum(self, its = 50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
-            numTerms = randint(10)
-            a_bms = [ gen_BandMat(size) for _ in range(numTerms) ]
+            num_terms = randint(10)
+            a_bms = [ gen_BandMat(size) for _ in range(num_terms) ]
             a_fulls = [ a_bm.full() for a_bm in a_bms ]
 
             b_bm = sum(a_bms)
             b_full = sum(a_fulls)
-            if numTerms > 0:
+            if num_terms > 0:
                 assert_allclose(b_bm.full(), b_full)
             for a_bm in a_bms:
                 assert not np.may_share_memory(b_bm.data, a_bm.data)

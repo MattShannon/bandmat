@@ -19,8 +19,8 @@ cython_locs = [
     ('bandmat', 'misc'),
 ]
 
-with open('README.rst') as readmeFile:
-    long_description = readmeFile.read()
+with open('README.rst') as readme_file:
+    long_description = readme_file.read()
 
 # see "A note on setup.py" in README.rst for an explanation of the dev file
 dev_mode = os.path.exists('dev')

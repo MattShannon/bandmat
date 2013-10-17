@@ -19,7 +19,7 @@ import scipy.linalg as sla
 import random
 from numpy.random import randn, randint
 
-def randBool():
+def rand_bool():
     return randint(0, 2) == 0
 
 def gen_symmetric_BandMat(size, depth = None):
@@ -30,23 +30,23 @@ def gen_symmetric_BandMat(size, depth = None):
     randomize_extra_entries_bm(b_bm)
     return b_bm
 
-def gen_pos_def_BandMat(size, depth = None, contribRank = 2):
+def gen_pos_def_BandMat(size, depth = None, contrib_rank = 2):
     """Generates a random positive definite BandMat."""
-    assert contribRank >= 0
+    assert contrib_rank >= 0
     if depth is None:
         depth = random.choice([0, 1, randint(0, 10)])
     mat_bm = bm.zeros(depth, depth, size)
-    for _ in range(contribRank):
+    for _ in range(contrib_rank):
         diff = randint(0, depth + 1)
         chol_bm = gen_BandMat(size, l = depth - diff, u = diff)
         bm.dot_mm_plus_equals(chol_bm, chol_bm.T, mat_bm)
-    transposed = randBool()
+    transposed = rand_bool()
     if transposed:
         mat_bm = mat_bm.T
     randomize_extra_entries_bm(mat_bm)
     return mat_bm
 
-def gen_chol_factor_BandMat(size, depth = None, contribRank = 2):
+def gen_chol_factor_BandMat(size, depth = None, contrib_rank = 2):
     """Generates a random Cholesky factor BandMat.
 
     This works by generating a random positive definite matrix and then
@@ -54,9 +54,9 @@ def gen_chol_factor_BandMat(size, depth = None, contribRank = 2):
     factor seems to often lead to ill-conditioned matrices.
     """
     mat_bm = gen_pos_def_BandMat(size, depth = depth,
-                                 contribRank = contribRank)
-    chol_bm = bla.cholesky(mat_bm, lower = randBool())
-    if randBool():
+                                 contrib_rank = contrib_rank)
+    chol_bm = bla.cholesky(mat_bm, lower = rand_bool())
+    if rand_bool():
         chol_bm = chol_bm.T
     assert chol_bm.l == 0 or chol_bm.u == 0
     assert chol_bm.l + chol_bm.u == mat_bm.l
@@ -69,8 +69,8 @@ class TestLinAlg(unittest.TestCase):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             mat_bm = gen_pos_def_BandMat(size)
             depth = mat_bm.l
-            lower = randBool()
-            alternative = randBool()
+            lower = rand_bool()
+            alternative = rand_bool()
 
             chol_bm = bla.cholesky(mat_bm, lower = lower,
                                    alternative = alternative)

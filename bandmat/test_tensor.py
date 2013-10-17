@@ -16,7 +16,7 @@ import numpy as np
 import random
 from numpy.random import randn, randint
 
-def randBool():
+def rand_bool():
     return randint(0, 2) == 0
 
 class TestTensor(unittest.TestCase):
@@ -54,7 +54,7 @@ class TestTensor(unittest.TestCase):
             a_bm = gen_BandMat(size)
             b_bm = gen_BandMat(size)
             c_bm = gen_BandMat(size)
-            diag = None if randBool() else randn(size)
+            diag = None if rand_bool() else randn(size)
             diag_value = np.ones((size,)) if diag is None else diag
             a_full = a_bm.full()
             b_full = b_bm.full()
@@ -80,7 +80,7 @@ class TestTensor(unittest.TestCase):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             a_bm = gen_BandMat(size)
             b_bm = gen_BandMat(size)
-            diag = None if randBool() else randn(size)
+            diag = None if rand_bool() else randn(size)
             diag_value = np.ones((size,)) if diag is None else diag
             a_full = a_bm.full()
             b_full = b_bm.full()
@@ -103,7 +103,7 @@ class TestTensor(unittest.TestCase):
             b_bm = gen_BandMat(size)
             l = random.choice([0, 1, randint(0, 10)])
             u = random.choice([0, 1, randint(0, 10)])
-            diag = None if randBool() else randn(size)
+            diag = None if rand_bool() else randn(size)
             diag_value = np.ones((size,)) if diag is None else diag
             a_full = a_bm.full()
             b_full = b_bm.full()

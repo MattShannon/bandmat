@@ -11,53 +11,53 @@ cimport cython
 cnp.import_array()
 cnp.import_ufunc()
 
-def fancy_plus_equals(cnp.ndarray[cnp.int_t, ndim=1] targetIndexSeq,
+def fancy_plus_equals(cnp.ndarray[cnp.int_t, ndim=1] target_index_seq,
                       cnp.ndarray[cnp.float64_t, ndim=1] source,
                       cnp.ndarray[cnp.float64_t, ndim=1] target):
     """Implements a += method with fancy indexing.
 
     Does what you might expect
-        target[targetIndexSeq] += source
+        target[target_index_seq] += source
     to do.
     """
-    cdef unsigned long sourceSize
+    cdef unsigned long source_size
 
-    sourceSize = source.shape[0]
-    assert targetIndexSeq.shape[0] == sourceSize
+    source_size = source.shape[0]
+    assert target_index_seq.shape[0] == source_size
 
-    cdef unsigned long sourceIndex
-    cdef long targetIndex
+    cdef unsigned long source_index
+    cdef long target_index
 
-    for sourceIndex in range(sourceSize):
-        targetIndex = targetIndexSeq[sourceIndex]
-        target[targetIndex] += source[sourceIndex]
+    for source_index in range(source_size):
+        target_index = target_index_seq[source_index]
+        target[target_index] += source[source_index]
 
     return
 
-def fancy_plus_equals_2d(cnp.ndarray[cnp.int_t, ndim=1] targetIndexSeq,
+def fancy_plus_equals_2d(cnp.ndarray[cnp.int_t, ndim=1] target_index_seq,
                          cnp.ndarray[cnp.float64_t, ndim=2] source,
                          cnp.ndarray[cnp.float64_t, ndim=2] target):
     """Implements a += method with fancy indexing.
 
     Does what you might expect
-        target[targetIndexSeq] += source
+        target[target_index_seq] += source
     to do.
     """
-    cdef unsigned long sourceSize
+    cdef unsigned long source_size
     cdef unsigned long size1
 
-    sourceSize = source.shape[0]
-    assert targetIndexSeq.shape[0] == sourceSize
+    source_size = source.shape[0]
+    assert target_index_seq.shape[0] == source_size
     size1 = source.shape[1]
     assert target.shape[1] == size1
 
-    cdef unsigned long sourceIndex
-    cdef long targetIndex
+    cdef unsigned long source_index
+    cdef long target_index
     cdef unsigned long index1
 
-    for sourceIndex in range(sourceSize):
-        targetIndex = targetIndexSeq[sourceIndex]
+    for source_index in range(source_size):
+        target_index = target_index_seq[source_index]
         for index1 in range(size1):
-            target[targetIndex, index1] += source[sourceIndex, index1]
+            target[target_index, index1] += source[source_index, index1]
 
     return

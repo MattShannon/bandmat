@@ -9,12 +9,13 @@ def assert_allclose(actual, desired, rtol = 1e-7, atol = 1e-14,
         raise AssertionError('%s (wrong shape)\n ACTUAL:  %r\n DESIRED: %r' %
                              (msg, actual, desired))
     if not np.allclose(actual, desired, rtol, atol):
-        absErr = np.abs(actual - desired)
-        relErr = np.abs((actual - desired) / desired)
+        abs_err = np.abs(actual - desired)
+        rel_err = np.abs((actual - desired) / desired)
         raise AssertionError('%s\n ACTUAL:  %r\n DESIRED: %r\n'
                              ' ABS ERR: %r (max %s)\n REL ERR: %r (max %s)' %
                              (msg, actual, desired,
-                              absErr, np.max(absErr), relErr, np.max(relErr)))
+                              abs_err, np.max(abs_err),
+                              rel_err, np.max(rel_err)))
 
 def assert_allequal(actual, desired, msg = 'items not equal'):
     if np.shape(actual) != np.shape(desired):
