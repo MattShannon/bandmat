@@ -89,7 +89,7 @@ def build_poe(b_frames, tau_frames, win_mats, sdw=None):
 
 def simple_example_with_random_parameters():
     windows = [
-        (0, 0, np.array([0.0])),
+        (0, 0, np.array([1.0])),
         (1, 1, np.array([-0.5, 0.0, 0.5])),
         (1, 1, np.array([1.0, -2.0, 1.0])),
     ]
