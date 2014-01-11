@@ -508,7 +508,7 @@ class BandMat(object):
         To obtain a BandMat with a fresh underlying data array, `.copy_exact()`
         should be called on the result.
 
-        The expression `a_bm.sub_matrix_view[start, end]` where `a_bm` is a
+        The expression `a_bm.sub_matrix_view(start, end)` where `a_bm` is a
         BandMat is the equivalent of:
 
             a_full[start:end, start:end]
