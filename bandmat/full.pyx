@@ -8,7 +8,7 @@ Though this is closely related to the representation of square banded matrices
 used by the `BandMat` class in the `core` module, it is logically distinct.
 """
 
-# Copyright 2013 Matt Shannon
+# Copyright 2013, 2014 Matt Shannon
 
 # This file is part of bandmat.
 # See `License` for details of license and warranty.

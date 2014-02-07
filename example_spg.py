@@ -14,7 +14,7 @@ computes the mean trajectory using a banded Cholesky decomposition.
 The mean trajectory is also the most likely or maximum probability trajectory.
 """
 
-# Copyright 2013 Matt Shannon
+# Copyright 2013, 2014 Matt Shannon
 
 # This file is part of bandmat.
 # See `License` for details of license and warranty.

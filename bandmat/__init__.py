@@ -86,7 +86,7 @@ Banded matrix multiplication:
  [   0.    0.    0.  104.  133.]]
 """
 
-# Copyright 2013 Matt Shannon
+# Copyright 2013, 2014 Matt Shannon
 
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
