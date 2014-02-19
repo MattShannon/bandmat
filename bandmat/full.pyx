@@ -173,7 +173,10 @@ def band_cTe(long l, long u,
     cdef long target_given = (target_rect is not None)
 
     size = mat_rect.shape[1]
-    if not target_given:
+    if target_given:
+        assert target_rect.shape[0] == l + u + 1
+        assert target_rect.shape[1] == size
+    else:
         target_rect = np.empty((l + u + 1, size))
 
     cdef long i
