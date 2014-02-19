@@ -27,7 +27,7 @@ def band_c(long l, long u, cnp.ndarray[cnp.float64_t, ndim=2] mat_rect):
 
     Given a rectangular numpy array `mat_rect`, this function returns a square
     numpy array `mat_full` with its `u` superdiagonals, diagonal and `l`
-    subdiagonals given given by the rows of `mat_rect`.
+    subdiagonals given by the rows of `mat_rect`.
     The part of each column of `mat_full` that lies within the band contains
     the same entries as the corresponding column of `mat_rect`.
 
