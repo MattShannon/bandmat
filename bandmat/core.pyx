@@ -92,7 +92,7 @@ class BandMat(object):
         It has the same `transposed` setting as `self`.
         """
         return BandMat(self.l, self.u, self.data.copy(),
-                       transposed = self.transposed)
+                       transposed=self.transposed)
 
     def copy(self):
         """Returns a copy of this BandMat with transposed set to False.
@@ -226,7 +226,7 @@ class BandMat(object):
 
         assert self.size == other.size
         c_bm = self.equiv(l_new=max(self.l, other.l),
-                          u_new = max(self.u, other.u))
+                          u_new=max(self.u, other.u))
         c_bm.plus_equals_band_of(other)
         return c_bm
 
@@ -254,7 +254,7 @@ class BandMat(object):
 
         assert self.size == other.size
         c_bm = self.equiv(l_new=max(self.l, other.l),
-                          u_new = max(self.u, other.u))
+                          u_new=max(self.u, other.u))
         c_bm.plus_equals_band_of(other, mult=-1.0)
         return c_bm
 
@@ -369,7 +369,7 @@ class BandMat(object):
             return NotImplemented
 
         return BandMat(self.l, self.u, self.data.__floordiv__(mult),
-                       transposed = self.transposed)
+                       transposed=self.transposed)
 
     def __div__(self, other):
         """Old-style divides a banded matrix by a scalar.
@@ -388,7 +388,7 @@ class BandMat(object):
             return NotImplemented
 
         return BandMat(self.l, self.u, self.data.__div__(mult),
-                       transposed = self.transposed)
+                       transposed=self.transposed)
 
     def __truediv__(self, other):
         """Divides a banded matrix by a scalar.
@@ -407,7 +407,7 @@ class BandMat(object):
             return NotImplemented
 
         return BandMat(self.l, self.u, self.data.__truediv__(mult),
-                       transposed = self.transposed)
+                       transposed=self.transposed)
 
     def __imul__(self, other):
         """Multiplies this matrix by a scalar in-place.
