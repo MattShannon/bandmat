@@ -547,8 +547,8 @@ class BandMat(object):
 def zeros(l, u, size):
     """Returns the zero matrix as a BandMat.
 
-    The returned BandMat `ret_bm` has `ret_bm.l = l`, `ret_bm.u` = `u` and
-    `ret_bm.size = size`.
+    The returned BandMat `ret_bm` has `ret_bm.l == l`, `ret_bm.u == u` and
+    `ret_bm.size == size`.
     """
     data = np.zeros((l + u + 1, size))
     return BandMat(l, u, data)
