@@ -1,4 +1,4 @@
-"""Tests for addition, multiplication, etc using banded matrices."""
+"""Tests for multiplication, etc using banded matrices."""
 
 # Copyright 2013, 2014 Matt Shannon
 

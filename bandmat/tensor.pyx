@@ -1,4 +1,4 @@
-"""Addition, multiplication, etc using banded matrices."""
+"""Multiplication, etc using banded matrices."""
 
 # Copyright 2013, 2014 Matt Shannon
 
