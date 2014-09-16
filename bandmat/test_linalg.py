@@ -171,9 +171,14 @@ class TestLinAlg(unittest.TestCase):
             chol_bm = gen_chol_factor_BandMat(size)
             depth = chol_bm.l + chol_bm.u
             lower = (chol_bm.u == 0)
+            chol_lower_bm = chol_bm if lower else chol_bm.T
             chol_full = chol_bm.full()
 
             x = bla.cho_solve(chol_bm, b)
+            assert_allclose(
+                bm.dot_mv(chol_lower_bm, bm.dot_mv(chol_lower_bm.T, x)),
+                b
+            )
             if size == 0:
                 x_good = np.zeros((size,))
             else:
@@ -191,6 +196,7 @@ class TestLinAlg(unittest.TestCase):
             a_full = a_bm.full()
 
             x = bla.solve(a_bm, b)
+            assert_allclose(bm.dot_mv(a_bm, x), b)
             if size == 0:
                 x_good = np.zeros((size,))
             else:
@@ -207,6 +213,7 @@ class TestLinAlg(unittest.TestCase):
             a_full = a_bm.full()
 
             x = bla.solveh(a_bm, b)
+            assert_allclose(bm.dot_mv(a_bm, x), b)
             if size == 0:
                 x_good = np.zeros((size,))
             else:
