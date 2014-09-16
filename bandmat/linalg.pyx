@@ -246,13 +246,13 @@ def cho_solve(chol_bm, b):
     b are vectors, and . indicates matrix multiplication.
     `chol_bm` is a Cholesky factor of A (either upper or lower).
     """
-    assert chol_bm.size == len(b)
-
-    if chol_bm.transposed:
-        chol_bm = chol_bm.T
-
     lower = (chol_bm.u == 0)
-    x = sla.cho_solve_banded((chol_bm.data, lower), b)
+    chol_lower_bm = chol_bm if lower else chol_bm.T
+
+    x = solve_triangular(
+        chol_lower_bm.T,
+        solve_triangular(chol_lower_bm, b)
+    )
     return x
 
 def solve(a_bm, b):
@@ -290,22 +290,8 @@ def solveh(a_bm, b):
     this function is undefined (currently either the upper or lower triangle is
     used and the rest of the matrix is ignored).
     """
-    assert a_bm.size == len(b)
-
-    if a_bm.transposed:
-        a_bm = a_bm.T
-
-    depth = a_bm.l
-    assert a_bm.u == depth
-    assert depth >= 0
-
-    lower = False
-    l = depth if lower else 0
-    u = 0 if lower else depth
-
-    a_half_data = a_bm.data[(depth - u):(depth + l + 1)]
-    chol_data = _cholesky_banded(a_half_data, lower=lower)
-    x = sla.cho_solve_banded((chol_data, lower), b)
+    chol_bm = cholesky(a_bm, lower=True)
+    x = cho_solve(chol_bm, b)
     return x
 
 @cython.boundscheck(False)
