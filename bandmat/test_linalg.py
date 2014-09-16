@@ -99,7 +99,7 @@ class TestLinAlg(unittest.TestCase):
         lfac[(1, 2, 3), (0, 1, 2)] = c[1, :3]
         assert_allclose(a, np.dot(lfac, lfac.T))
 
-    def test_cholesky_banded(self, its=50):
+    def test__cholesky_banded(self, its=100):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             if rand_bool():

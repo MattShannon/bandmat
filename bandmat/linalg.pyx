@@ -169,7 +169,7 @@ def cho_solve(chol_bm, b):
     return x
 
 def solve(a_bm, b):
-    """Solves a matrix equation.
+    """Solves a banded matrix equation.
 
     Solves A . x = b for x, where A is a square banded matrix, x and b are
     vectors, and . indicates matrix multiplication.
