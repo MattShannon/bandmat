@@ -230,6 +230,8 @@ def solve_triangular(a_bm, b):
     Solves A . x = b for x, where A is a upper or lower triangular banded
     matrix, x and b are vectors, and . indicates matrix multiplication.
     """
+    assert a_bm.l == 0 or a_bm.u == 0
+
     transposed = a_bm.transposed
     lower = (a_bm.u == 0)
     # whether a_bm.data represents a lower or upper triangular matrix
@@ -246,6 +248,8 @@ def cho_solve(chol_bm, b):
     b are vectors, and . indicates matrix multiplication.
     `chol_bm` is a Cholesky factor of A (either upper or lower).
     """
+    assert chol_bm.l == 0 or chol_bm.u == 0
+
     lower = (chol_bm.u == 0)
     chol_lower_bm = chol_bm if lower else chol_bm.T
 
