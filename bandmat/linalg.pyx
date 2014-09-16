@@ -32,9 +32,9 @@ cnp.import_array()
 cnp.import_ufunc()
 
 @cython.boundscheck(False)
-def cholesky_banded(cnp.ndarray[cnp.float64_t, ndim=2] mat,
-                    long overwrite_ab=False,
-                    long lower=False):
+def _cholesky_banded(cnp.ndarray[cnp.float64_t, ndim=2] mat,
+                     long overwrite_ab=False,
+                     long lower=False):
     """A cython reimplementation of scipy.linalg.cholesky_banded.
 
     Using lower == True is slightly more time and space efficient than using
@@ -138,10 +138,10 @@ def cholesky(mat_bm, lower=False, alternative=False):
 
     mat_half_data = mat_bm.data[(depth - u):(depth + l + 1)]
     if alternative:
-        chol_data = cholesky_banded(mat_half_data[::-1, ::-1],
-                                    lower=(not lower))[::-1, ::-1]
+        chol_data = _cholesky_banded(mat_half_data[::-1, ::-1],
+                                     lower=(not lower))[::-1, ::-1]
     else:
-        chol_data = cholesky_banded(mat_half_data, lower=lower)
+        chol_data = _cholesky_banded(mat_half_data, lower=lower)
     chol_bm = BandMat(l, u, chol_data)
 
     return chol_bm
@@ -211,7 +211,7 @@ def solveh(a_bm, b):
     u = 0 if lower else depth
 
     a_half_data = a_bm.data[(depth - u):(depth + l + 1)]
-    chol_data = cholesky_banded(a_half_data, lower=lower)
+    chol_data = _cholesky_banded(a_half_data, lower=lower)
     x = sla.cho_solve_banded((chol_data, lower), b)
     return x
 

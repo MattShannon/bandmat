@@ -77,7 +77,7 @@ class TestLinAlg(unittest.TestCase):
         # Banded storage form of `a`.
         ab = np.array([[-1.0, 1.0, 0.5, 0.2],
                        [4.0, 4.0, 4.0, 4.0]])
-        c = bla.cholesky_banded(ab, lower=False)
+        c = bla._cholesky_banded(ab, lower=False)
         ufac = np.zeros_like(a)
         ufac[range(4), range(4)] = c[-1]
         ufac[(0, 1, 2), (1, 2, 3)] = c[0, 1:]
@@ -93,7 +93,7 @@ class TestLinAlg(unittest.TestCase):
         # Banded storage form of `a`.
         ab = np.array([[4.0, 4.0, 4.0, 4.0],
                        [1.0, 0.5, 0.2, -1.0]])
-        c = bla.cholesky_banded(ab, lower=True)
+        c = bla._cholesky_banded(ab, lower=True)
         lfac = np.zeros_like(a)
         lfac[range(4), range(4)] = c[0]
         lfac[(1, 2, 3), (0, 1, 2)] = c[1, :3]
@@ -118,7 +118,7 @@ class TestLinAlg(unittest.TestCase):
 
             mat_half_data_arg = mat_half_data.copy()
             try:
-                chol_data = bla.cholesky_banded(
+                chol_data = bla._cholesky_banded(
                     mat_half_data_arg, overwrite_ab=overwrite, lower=lower
                 )
             except la.LinAlgError, e:
