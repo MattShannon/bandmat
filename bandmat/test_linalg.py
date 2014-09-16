@@ -13,6 +13,7 @@ import bandmat.full as fl
 import bandmat.linalg as bla
 
 import unittest
+import re
 import numpy as np
 import numpy.linalg as la
 import scipy.linalg as sla
@@ -22,25 +23,28 @@ from numpy.random import randn, randint
 def rand_bool():
     return randint(0, 2) == 0
 
-def gen_symmetric_BandMat(size, depth=None):
+def gen_symmetric_BandMat(size, depth=None, transposed=None):
     if depth is None:
         depth = random.choice([0, 1, randint(0, 10)])
-    a_bm = gen_BandMat(size, l=depth, u=depth)
+    if transposed is None:
+        transposed = rand_bool()
+    a_bm = gen_BandMat(size, l=depth, u=depth, transposed=transposed)
     b_bm = a_bm + a_bm.T
     randomize_extra_entries_bm(b_bm)
     return b_bm
 
-def gen_pos_def_BandMat(size, depth=None, contrib_rank=2):
+def gen_pos_def_BandMat(size, depth=None, contrib_rank=2, transposed=None):
     """Generates a random positive definite BandMat."""
     assert contrib_rank >= 0
     if depth is None:
         depth = random.choice([0, 1, randint(0, 10)])
+    if transposed is None:
+        transposed = rand_bool()
     mat_bm = bm.zeros(depth, depth, size)
     for _ in range(contrib_rank):
         diff = randint(0, depth + 1)
         chol_bm = gen_BandMat(size, l=depth - diff, u=diff)
         bm.dot_mm_plus_equals(chol_bm, chol_bm.T, mat_bm)
-    transposed = rand_bool()
     if transposed:
         mat_bm = mat_bm.T
     randomize_extra_entries_bm(mat_bm)
@@ -63,6 +67,83 @@ def gen_chol_factor_BandMat(size, depth=None, contrib_rank=2):
     return chol_bm
 
 class TestLinAlg(unittest.TestCase):
+    def test_cholesky_banded_upper_scipy_test(self):
+        """Basic test copied from scipy.linalg.tests.test_decomp_cholesky."""
+        # Symmetric positive definite banded matrix `a`
+        a = np.array([[4.0, 1.0, 0.0, 0.0],
+                      [1.0, 4.0, 0.5, 0.0],
+                      [0.0, 0.5, 4.0, 0.2],
+                      [0.0, 0.0, 0.2, 4.0]])
+        # Banded storage form of `a`.
+        ab = np.array([[-1.0, 1.0, 0.5, 0.2],
+                       [4.0, 4.0, 4.0, 4.0]])
+        c = bla.cholesky_banded(ab, lower=False)
+        ufac = np.zeros_like(a)
+        ufac[range(4), range(4)] = c[-1]
+        ufac[(0, 1, 2), (1, 2, 3)] = c[0, 1:]
+        assert_allclose(a, np.dot(ufac.T, ufac))
+
+    def test_cholesky_banded_lower_scipy_test(self):
+        """Basic test copied from scipy.linalg.tests.test_decomp_cholesky."""
+        # Symmetric positive definite banded matrix `a`
+        a = np.array([[4.0, 1.0, 0.0, 0.0],
+                      [1.0, 4.0, 0.5, 0.0],
+                      [0.0, 0.5, 4.0, 0.2],
+                      [0.0, 0.0, 0.2, 4.0]])
+        # Banded storage form of `a`.
+        ab = np.array([[4.0, 4.0, 4.0, 4.0],
+                       [1.0, 0.5, 0.2, -1.0]])
+        c = bla.cholesky_banded(ab, lower=True)
+        lfac = np.zeros_like(a)
+        lfac[range(4), range(4)] = c[0]
+        lfac[(1, 2, 3), (0, 1, 2)] = c[1, :3]
+        assert_allclose(a, np.dot(lfac, lfac.T))
+
+    def test_cholesky_banded(self, its=50):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            if rand_bool():
+                mat_bm = gen_pos_def_BandMat(size, transposed=False)
+            else:
+                mat_bm = gen_symmetric_BandMat(size, transposed=False)
+                # make it a bit more likely to be pos def
+                bm.diag(mat_bm)[:] = np.abs(bm.diag(mat_bm)) + 0.1
+            depth = mat_bm.l
+            lower = rand_bool()
+            if lower:
+                mat_half_data = mat_bm.data[depth:]
+            else:
+                mat_half_data = mat_bm.data[:(depth + 1)]
+            overwrite = rand_bool()
+
+            mat_half_data_arg = mat_half_data.copy()
+            try:
+                chol_data = bla.cholesky_banded(
+                    mat_half_data_arg, overwrite_ab=overwrite, lower=lower
+                )
+            except la.LinAlgError, e:
+                msgRe = '^' + re.escape(str(e)) + '$'
+                with self.assertRaisesRegexp(la.LinAlgError, msgRe):
+                    sla.cholesky(mat_bm.full(), lower=lower)
+            else:
+                assert np.shape(chol_data) == (depth + 1, size)
+                if lower:
+                    chol_bm = bm.BandMat(depth, 0, chol_data)
+                    mat_bm_again = bm.dot_mm(chol_bm, chol_bm.T)
+                else:
+                    chol_bm = bm.BandMat(0, depth, chol_data)
+                    mat_bm_again = bm.dot_mm(chol_bm.T, chol_bm)
+                assert_allclose(mat_bm_again.full(), mat_bm.full())
+
+                if size > 0:
+                    self.assertEquals(
+                        np.may_share_memory(chol_data, mat_half_data_arg),
+                        overwrite
+                    )
+
+            if not overwrite:
+                assert np.all(mat_half_data_arg == mat_half_data)
+
     def test_cholesky(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])

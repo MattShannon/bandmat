@@ -19,15 +19,81 @@ triangles are represented in memory.
 
 import bandmat as bm
 from bandmat import BandMat
+import bandmat.full as fl
 
 import numpy as np
 import scipy.linalg as sla
 
 cimport numpy as cnp
 cimport cython
+from libc.math cimport sqrt
 
 cnp.import_array()
 cnp.import_ufunc()
+
+@cython.boundscheck(False)
+def cholesky_banded(cnp.ndarray[cnp.float64_t, ndim=2] mat,
+                    long overwrite_ab=False,
+                    long lower=False):
+    """A cython reimplementation of scipy.linalg.cholesky_banded.
+
+    Using lower == True is slightly more time and space efficient than using
+    lower == False for this implementation.
+    The default is False only for compatibility with the scipy implementation.
+
+    (This simple implementation seems to be much faster than the scipy
+    implementation, especially for small bandwidths.
+    This is surprising since the scipy implementation wraps an LAPACK call
+    which one would expect to be very fast.
+    I am still unsure why this is, though I have checked it is not to do with
+    Fortran-contiguous versus C-contiguous ordering.
+    The scipy implementation performs a relatively expensive finite-value check
+    which is arguably not necessary for our implementation, but this only
+    accounts for part of the difference.)
+    """
+    cdef long frames
+    cdef long depth
+    cdef cnp.ndarray[cnp.float64_t, ndim=2] mat_orig
+
+    frames = mat.shape[1]
+    depth = mat.shape[0] - 1
+    assert depth >= 0
+
+    mat_orig = mat
+    if not lower:
+        mat = fl.band_cTe(0, depth, mat)
+    elif not overwrite_ab:
+        mat = mat.copy()
+
+    cdef unsigned long frame, k, l
+    cdef double iv0, siv0
+    cdef cnp.ndarray[cnp.float64_t, ndim=1] v = np.empty((depth,))
+
+    for frame in range(frames):
+        iv0 = 1.0 / mat[0, frame]
+        if iv0 <= 0.0:
+            raise sla.LinAlgError('%d-th leading minor not positive definite' % (frame + 1))
+        siv0 = sqrt(iv0)
+
+        for k in range(depth):
+            v[k] = mat[k + 1, frame]
+
+        mat[0, frame] = 1.0 / siv0
+        for k in range(depth):
+            mat[k + 1, frame] = v[k] * siv0
+
+        for k in range(min(depth, frames - frame - 1)):
+            for l in range(depth - k):
+                mat[l, k + frame + 1] -= v[l + k] * v[k] * iv0
+
+    if not lower:
+        if overwrite_ab:
+            fl.band_cTe(depth, 0, mat, target_rect=mat_orig)
+            mat = mat_orig
+        else:
+            mat = fl.band_cTe(depth, 0, mat)
+
+    return mat
 
 def cholesky(mat_bm, lower=False, alternative=False):
     """Computes the Cholesky factor of a positive definite banded matrix.
@@ -70,16 +136,13 @@ def cholesky(mat_bm, lower=False, alternative=False):
     l = depth if lower else 0
     u = 0 if lower else depth
 
-    if mat_bm.size == 0:
-        chol_bm = BandMat(l, u, np.zeros((depth + 1, 0)))
+    mat_half_data = mat_bm.data[(depth - u):(depth + l + 1)]
+    if alternative:
+        chol_data = cholesky_banded(mat_half_data[::-1, ::-1],
+                                    lower=(not lower))[::-1, ::-1]
     else:
-        mat_half_data = mat_bm.data[(depth - u):(depth + l + 1)]
-        if alternative:
-            chol_data = sla.cholesky_banded(mat_half_data[::-1, ::-1],
-                                            lower=(not lower))[::-1, ::-1]
-        else:
-            chol_data = sla.cholesky_banded(mat_half_data, lower=lower)
-        chol_bm = BandMat(l, u, chol_data)
+        chol_data = cholesky_banded(mat_half_data, lower=lower)
+    chol_bm = BandMat(l, u, chol_data)
 
     return chol_bm
 
