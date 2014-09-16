@@ -210,11 +210,9 @@ def solveh(a_bm, b):
     l = depth if lower else 0
     u = 0 if lower else depth
 
-    if a_bm.size == 0:
-        x = np.zeros_like(b)
-    else:
-        a_half_data = a_bm.data[(depth - u):(depth + l + 1)]
-        x = sla.solveh_banded(a_half_data, b, lower=lower)
+    a_half_data = a_bm.data[(depth - u):(depth + l + 1)]
+    chol_data = cholesky_banded(a_half_data, lower=lower)
+    x = sla.cho_solve_banded((chol_data, lower), b)
     return x
 
 @cython.boundscheck(False)
