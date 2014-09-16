@@ -101,6 +101,78 @@ def _cholesky_banded(cnp.ndarray[cnp.float64_t, ndim=2] mat,
 
     return mat
 
+@cython.boundscheck(False)
+@cython.cdivision(True)
+def _solve_triangular_banded(cnp.ndarray[cnp.float64_t, ndim=2] a_rect,
+                             cnp.ndarray[cnp.float64_t, ndim=1] b,
+                             long transposed=False,
+                             long lower=False,
+                             long overwrite_b=False):
+    """A cython implementation of missing scipy.linalg.solve_triangular_banded.
+
+    Solves A . x = b (transposed == False) or A.T . x = b (transposed == True)
+    for x, where A is a upper or lower triangular banded matrix, x and b are
+    vectors, . indicates matrix multiplication, and A.T denotes the transpose
+    of A.
+    The argument `lower` indicates whether `a_rect` stores a lower triangle or
+    an upper triangle.
+
+    This replicates functionality present in the LAPACK routine dtbtrs.
+    If this function existed in scipy, it would probably be
+    scipy.linalg.solve_triangular_banded.
+    """
+    cdef unsigned long frames, depth
+    cdef long solve_lower
+    cdef cnp.ndarray[cnp.float64_t, ndim=1] x
+
+    frames = a_rect.shape[1]
+    assert a_rect.shape[0] >= 1
+    depth = a_rect.shape[0] - 1
+    assert b.shape[0] == frames
+
+    solve_lower = (lower != transposed)
+
+    if overwrite_b:
+        x = b
+    else:
+        x = np.empty_like(b)
+
+    cdef unsigned long pos, frame, framePrev, k
+    cdef double diff, denom
+
+    for pos in range(frames):
+        frame = pos if solve_lower else frames - 1 - pos
+        diff = b[frame]
+        if lower:
+            if transposed:
+                for k in range(1, min(depth + 1, pos + 1)):
+                    framePrev = frame + k
+                    diff -= a_rect[k, frame] * x[framePrev]
+                denom = a_rect[<unsigned long>(0), frame]
+            else:
+                for k in range(1, min(depth + 1, pos + 1)):
+                    framePrev = frame - k
+                    diff -= a_rect[k, framePrev] * x[framePrev]
+                denom = a_rect[<unsigned long>(0), frame]
+        else:
+            if transposed:
+                for k in range(1, min(depth + 1, pos + 1)):
+                    framePrev = frame - k
+                    diff -= a_rect[depth - k, frame] * x[framePrev]
+                denom = a_rect[depth, frame]
+            else:
+                for k in range(1, min(depth + 1, pos + 1)):
+                    framePrev = frame + k
+                    diff -= a_rect[depth - k, framePrev] * x[framePrev]
+                denom = a_rect[depth, frame]
+        if denom == 0.0:
+            raise sla.LinAlgError(
+                'singular matrix: resolution failed at diagonal %d' % frame
+            )
+        x[frame] = diff / denom
+
+    return x
+
 def cholesky(mat_bm, lower=False, alternative=False):
     """Computes the Cholesky factor of a positive definite banded matrix.
 
@@ -151,6 +223,21 @@ def cholesky(mat_bm, lower=False, alternative=False):
     chol_bm = BandMat(l, u, chol_data)
 
     return chol_bm
+
+def solve_triangular(a_bm, b):
+    """Solves a triangular banded matrix equation.
+
+    Solves A . x = b for x, where A is a upper or lower triangular banded
+    matrix, x and b are vectors, and . indicates matrix multiplication.
+    """
+    transposed = a_bm.transposed
+    lower = (a_bm.u == 0)
+    # whether a_bm.data represents a lower or upper triangular matrix
+    data_lower = (lower != transposed)
+    x = _solve_triangular_banded(a_bm.data, b,
+                                 transposed=transposed,
+                                 lower=data_lower)
+    return x
 
 def cho_solve(chol_bm, b):
     """Solves a matrix equation given the Cholesky decomposition of the matrix.

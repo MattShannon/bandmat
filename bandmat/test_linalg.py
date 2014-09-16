@@ -50,16 +50,18 @@ def gen_pos_def_BandMat(size, depth=None, contrib_rank=2, transposed=None):
     randomize_extra_entries_bm(mat_bm)
     return mat_bm
 
-def gen_chol_factor_BandMat(size, depth=None, contrib_rank=2):
+def gen_chol_factor_BandMat(size, depth=None, contrib_rank=2, transposed=None):
     """Generates a random Cholesky factor BandMat.
 
     This works by generating a random positive definite matrix and then
     computing its Cholesky factor, since using a random matrix as a Cholesky
     factor seems to often lead to ill-conditioned matrices.
     """
+    if transposed is None:
+        transposed = rand_bool()
     mat_bm = gen_pos_def_BandMat(size, depth=depth, contrib_rank=contrib_rank)
     chol_bm = bla.cholesky(mat_bm, lower=rand_bool())
-    if rand_bool():
+    if transposed:
         chol_bm = chol_bm.T
     assert chol_bm.l == 0 or chol_bm.u == 0
     assert chol_bm.l + chol_bm.u == mat_bm.l
@@ -144,6 +146,65 @@ class TestLinAlg(unittest.TestCase):
             if not overwrite:
                 assert np.all(mat_half_data_arg == mat_half_data)
 
+    def test__solve_triangular_banded(self, its=100):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            b = randn(size)
+            chol_bm = gen_chol_factor_BandMat(size, transposed=False)
+            chol_data = chol_bm.data
+            depth = chol_bm.l + chol_bm.u
+            lower = (chol_bm.u == 0)
+            if size > 0 and rand_bool() and rand_bool():
+                badFrame = randint(size)
+                chol_data[0 if lower else depth, badFrame] = 0.0
+            else:
+                badFrame = None
+            transposed = rand_bool()
+            overwrite_b = rand_bool()
+            chol_full = chol_bm.full()
+
+            b_arg = b.copy()
+            if badFrame is not None:
+                msg = (
+                    'singular matrix: resolution failed at diagonal %d' %
+                    badFrame
+                )
+                msgRe = '^' + re.escape(msg) + '$'
+                with self.assertRaisesRegexp(la.LinAlgError, msgRe):
+                    bla._solve_triangular_banded(
+                        chol_data, b_arg, transposed=transposed, lower=lower,
+                        overwrite_b=overwrite_b
+                    )
+                with self.assertRaisesRegexp(la.LinAlgError, msgRe):
+                    sla.solve_triangular(
+                        chol_full, b, trans=transposed, lower=lower
+                    )
+            else:
+                x = bla._solve_triangular_banded(
+                    chol_data, b_arg, transposed=transposed, lower=lower,
+                    overwrite_b=overwrite_b
+                )
+                if transposed:
+                    assert_allclose(bm.dot_mv(chol_bm.T, x), b)
+                else:
+                    assert_allclose(bm.dot_mv(chol_bm, x), b)
+                if size == 0:
+                    x_good = np.zeros((size,))
+                else:
+                    x_good = sla.solve_triangular(
+                        chol_full, b, trans=transposed, lower=lower
+                    )
+                assert_allclose(x, x_good)
+                assert not np.may_share_memory(x, chol_data)
+                if size > 0:
+                    self.assertEquals(
+                        np.may_share_memory(x, b_arg),
+                        overwrite_b
+                    )
+
+            if not overwrite_b:
+                assert np.all(b_arg == b)
+
     def test_cholesky(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
@@ -163,6 +224,26 @@ class TestLinAlg(unittest.TestCase):
             else:
                 mat_bm_again = bm.dot_mm(chol_bm.T, chol_bm)
             assert_allclose(mat_bm_again.full(), mat_bm.full())
+
+    def test_solve_triangular(self, its=50):
+        for it in range(its):
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
+            b = randn(size)
+            chol_bm = gen_chol_factor_BandMat(size)
+            depth = chol_bm.l + chol_bm.u
+            lower = (chol_bm.u == 0)
+            chol_lower_bm = chol_bm if lower else chol_bm.T
+            chol_full = chol_bm.full()
+
+            x = bla.solve_triangular(chol_bm, b)
+            assert_allclose(bm.dot_mv(chol_bm, x), b)
+            if size == 0:
+                x_good = np.zeros((size,))
+            else:
+                x_good = sla.solve_triangular(chol_full, b, lower=lower)
+            assert_allclose(x, x_good)
+            assert not np.may_share_memory(x, chol_bm.data)
+            assert not np.may_share_memory(x, b)
 
     def test_cho_solve(self, its=50):
         for it in range(its):
