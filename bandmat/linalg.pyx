@@ -32,6 +32,7 @@ cnp.import_array()
 cnp.import_ufunc()
 
 @cython.boundscheck(False)
+@cython.cdivision(True)
 def _cholesky_banded(cnp.ndarray[cnp.float64_t, ndim=2] mat,
                      long overwrite_ab=False,
                      long lower=False):
@@ -51,13 +52,12 @@ def _cholesky_banded(cnp.ndarray[cnp.float64_t, ndim=2] mat,
     which is arguably not necessary for our implementation, but this only
     accounts for part of the difference.)
     """
-    cdef long frames
-    cdef long depth
+    cdef unsigned long frames, depth
     cdef cnp.ndarray[cnp.float64_t, ndim=2] mat_orig
 
     frames = mat.shape[1]
+    assert mat.shape[0] >= 1
     depth = mat.shape[0] - 1
-    assert depth >= 0
 
     mat_orig = mat
     if not lower:
@@ -66,19 +66,25 @@ def _cholesky_banded(cnp.ndarray[cnp.float64_t, ndim=2] mat,
         mat = mat.copy()
 
     cdef unsigned long frame, k, l
-    cdef double iv0, siv0
-    cdef cnp.ndarray[cnp.float64_t, ndim=1] v = np.empty((depth,))
+    cdef double v0, iv0, siv0
+    cdef cnp.ndarray[cnp.float64_t, ndim=1] v = np.empty(
+        (depth,),
+        dtype=np.float64
+    )
 
     for frame in range(frames):
-        iv0 = 1.0 / mat[0, frame]
-        if iv0 <= 0.0:
-            raise sla.LinAlgError('%d-th leading minor not positive definite' % (frame + 1))
+        v0 = mat[<unsigned long>(0), frame]
+        if v0 <= 0.0:
+            raise sla.LinAlgError(
+                '%d-th leading minor not positive definite' % (frame + 1)
+            )
+        iv0 = 1.0 / v0
         siv0 = sqrt(iv0)
 
         for k in range(depth):
             v[k] = mat[k + 1, frame]
 
-        mat[0, frame] = 1.0 / siv0
+        mat[<unsigned long>(0), frame] = 1.0 / siv0
         for k in range(depth):
             mat[k + 1, frame] = v[k] * siv0
 
