@@ -11,7 +11,7 @@ def assert_allclose(actual, desired, rtol=1e-7, atol=1e-14,
     if not np.allclose(actual, desired, rtol, atol):
         abs_err = np.abs(actual - desired)
         rel_err = np.abs((actual - desired) / desired)
-        raise AssertionError('%s\n ACTUAL:  %r\n DESIRED: %r\n'
+        raise AssertionError('%s\n ACTUAL:\n%r\n DESIRED:\n%r\n'
                              ' ABS ERR: %r (max %s)\n REL ERR: %r (max %s)' %
                              (msg, actual, desired,
                               abs_err, np.max(abs_err),
@@ -22,7 +22,7 @@ def assert_allequal(actual, desired, msg='items not equal'):
         raise AssertionError('%s (wrong shape)\n ACTUAL:  %r\n DESIRED: %r' %
                              (msg, actual, desired))
     if not np.all(actual == desired):
-        raise AssertionError('%s\n ACTUAL:  %r\n DESIRED: %r' %
+        raise AssertionError('%s\n ACTUAL:\n%r\n DESIRED:\n%r' %
                              (msg, actual, desired))
 
 def randomize_extra_entries(l, u, mat_rect):
