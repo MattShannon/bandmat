@@ -5,12 +5,11 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
-from bandmat.testhelp import assert_allclose, assert_allequal, get_array_mem
+from bandmat.testhelp import assert_allclose, get_array_mem
 
 from bandmat.misc import fancy_plus_equals, fancy_plus_equals_2d
 
 import unittest
-import numpy as np
 import random
 from numpy.random import randn, randint
 
