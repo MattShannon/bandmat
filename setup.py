@@ -17,6 +17,7 @@ cython_locs = [
     ('bandmat', 'tensor'),
     ('bandmat', 'linalg'),
     ('bandmat', 'misc'),
+    ('bandmat', 'overlap'),
 ]
 
 with open('README.rst') as readme_file:
