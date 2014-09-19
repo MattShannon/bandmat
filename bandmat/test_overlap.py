@@ -79,30 +79,33 @@ class TestOverlap(unittest.TestCase):
         for it in range(its):
             size = random.choice([0, 1, randint(10), randint(100)])
             depth = random.choice([0, 1, randint(0, 10)])
-            vec = randn(size + depth)
+            vec = randn(size)
 
             subvectors = bmo.extract_overlapping_v(vec, depth)
-            assert subvectors.shape == (size, depth + 1)
-            for frame in range(size):
+            assert subvectors.shape == (size + depth, depth + 1)
+
+            vec_ext = np.zeros((size + depth * 2,))
+            vec_ext[depth:(size + depth)] = vec
+            for frame in range(size + depth):
                 assert_allequal(
                     subvectors[frame],
-                    vec[frame:(frame + depth + 1)]
+                    vec_ext[frame:(frame + depth + 1)]
                 )
 
     def test_extract_overlapping_m(self, its=50):
         for it in range(its):
             size = random.choice([0, 1, randint(10), randint(100)])
             depth = random.choice([0, 1, randint(0, 10)])
-            mat_bm = gen_BandMat(size + depth, l=depth, u=depth)
-            mat_full = mat_bm.full()
+            mat_bm = gen_BandMat(size, l=depth, u=depth)
 
             submats = bmo.extract_overlapping_m(mat_bm)
-            assert submats.shape == (size, depth + 1, depth + 1)
-            for frame in range(size):
+            assert submats.shape == (size + depth, depth + 1, depth + 1)
+
+            mat_bm_ext = mat_bm.embed_as_sub_matrix(depth, size + depth * 2)
+            for frame in range(size + depth):
                 assert_allequal(
                     submats[frame],
-                    mat_full[frame:(frame + depth + 1),
-                             frame:(frame + depth + 1)]
+                    mat_bm_ext.sub_matrix_view(frame, frame + depth + 1).full()
                 )
 
 if __name__ == '__main__':
