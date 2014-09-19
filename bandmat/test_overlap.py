@@ -56,15 +56,15 @@ class TestOverlap(unittest.TestCase):
                 assert_allequal(vec, contribs[0])
             else:
                 # check action under splitting list of contributions in two
-                splitPos = randint(size + 1)
+                split_pos = randint(size + 1)
                 vec_again = np.zeros((size + depth,))
                 bmo.sum_overlapping_v(
-                    contribs[:splitPos],
-                    target=vec_again[0:(splitPos + depth)]
+                    contribs[:split_pos],
+                    target=vec_again[0:(split_pos + depth)]
                 )
                 bmo.sum_overlapping_v(
-                    contribs[splitPos:],
-                    target=vec_again[splitPos:(size + depth)]
+                    contribs[split_pos:],
+                    target=vec_again[split_pos:(size + depth)]
                 )
                 assert_allclose(vec, vec_again)
 
@@ -92,16 +92,16 @@ class TestOverlap(unittest.TestCase):
                 assert_allequal(mat_bm.full(), contribs[0])
             else:
                 # check action under splitting list of contributions in two
-                splitPos = randint(size + 1)
+                split_pos = randint(size + 1)
                 mat_bm_again = bm.zeros(depth, depth, size + depth)
                 bmo.sum_overlapping_m(
-                    contribs[:splitPos],
-                    target_bm=mat_bm_again.sub_matrix_view(0, splitPos + depth)
+                    contribs[:split_pos],
+                    target_bm=mat_bm_again.sub_matrix_view(0, split_pos + depth)
                 )
                 bmo.sum_overlapping_m(
-                    contribs[splitPos:],
+                    contribs[split_pos:],
                     target_bm=mat_bm_again.sub_matrix_view(
-                        splitPos, size + depth
+                        split_pos, size + depth
                     )
                 )
                 assert_allclose(*cc(mat_bm, mat_bm_again))
