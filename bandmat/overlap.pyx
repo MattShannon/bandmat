@@ -17,42 +17,45 @@ cnp.import_ufunc()
 
 @cython.boundscheck(False)
 def sum_overlapping_v(cnp.ndarray[cnp.float64_t, ndim=2] contribs,
+                      unsigned long step=1,
                       cnp.ndarray[cnp.float64_t, ndim=1] target=None):
     """Computes the overlapped sum of a sequence of vectors.
 
     The overlapped sum of a sequence of vectors is defined as follows.
     Suppose the vectors in `contribs` are "laid out" along some larger vector
-    such that each element of `contribs` is offset by 1 index relative to the
-    previous element.
-    For example `contribs[0]` occupies the left edge of the larger vector and
-    `contribs[1]` is positioned 1 index "right" of this.
+    such that each element of `contribs` is offset by `step` indices relative
+    to the previous element.
+    For example `contribs[0]` occupies the left edge of the larger vector,
+    `contribs[1]` starts at index `step` and `contribs[2]` starts at index
+    `step * 2`.
     The overlapped sum is the sum of these vectors laid out in this way, which
     is a vector.
 
     If `target` is None then a new vector is returned; otherwise the overlapped
     sum is added to the vector `target`.
-    If `contribs` has shape (T, K + 1) then the returned vector (or `target` if
-    specified) has size T + K.
-    The value K here must be non-negative.
+    If `contribs` has shape `(num_contribs, width)` then the returned vector
+    (or `target` if specified) has size `num_contribs * step + width - step`.
+    The value of `width` here must be at least `step`.
     """
-    assert contribs.shape[1] >= 1
+    assert contribs.shape[1] >= step
 
-    cdef unsigned long depth = contribs.shape[1] - 1
-    cdef unsigned long width = depth + 1
-    cdef unsigned long size = contribs.shape[0]
+    cdef unsigned long width = contribs.shape[1]
+    cdef unsigned long num_contribs = contribs.shape[0]
+    cdef unsigned long vec_size = num_contribs * step + width - step
     cdef cnp.ndarray[cnp.float64_t, ndim=1] vec
 
     if target is None:
-        vec = np.zeros((size + depth,), dtype=contribs.dtype)
+        vec = np.zeros((vec_size,), dtype=contribs.dtype)
     else:
-        assert target.shape[0] == size + depth
+        assert target.shape[0] == vec_size
         vec = target
 
-    cdef unsigned long frame, k
+    cdef unsigned long index, frame, k
 
-    for frame in range(size):
+    for index in range(num_contribs):
+        frame = index * step
         for k in range(width):
-            vec[frame + k] += contribs[frame, k]
+            vec[frame + k] += contribs[index, k]
 
     if target is None:
         return vec
@@ -61,15 +64,16 @@ def sum_overlapping_v(cnp.ndarray[cnp.float64_t, ndim=2] contribs,
 
 @cython.boundscheck(False)
 def sum_overlapping_m(cnp.ndarray[cnp.float64_t, ndim=3] contribs,
+                      unsigned long step=1,
                       target_bm=None):
     """Computes the overlapped sum of a sequence of square matrices.
 
     The overlapped sum of a sequence of matrices is defined as follows.
     Suppose the matrices in `contribs` are "laid out" along the diagonal of
-    some larger matrix such that each element of `contribs` is 1 index further
-    down and 1 index further right than the previous element.
+    some larger matrix such that each element of `contribs` is `step` indices
+    further down and `step` indices further right than the previous element.
     For example `contribs[0]` occupies the top left corner of the larger matrix
-    and `contribs[1]` is 1 index down and right of this.
+    and `contribs[1]` is `step` indices down and right of this.
     The overlapped sum is the sum of these matrices laid out in this way, which
     is a banded matrix.
     For this function the contributions are square, so the resulting banded
@@ -77,39 +81,43 @@ def sum_overlapping_m(cnp.ndarray[cnp.float64_t, ndim=3] contribs,
 
     If `target_bm` is None then a new BandMat is returned; otherwise the
     overlapped sum is added to the BandMat `target_bm`.
-    If `contribs` has shape (T, K + 1, K + 1) then the returned BandMat (or
-    `target_bm` if specified) has size T + K and upper and lower bandwidth K.
-    The value K here must be non-negative.
+    If `contribs` has shape `(num_contribs, width, width)` then the returned
+    BandMat (or `target_bm` if specified) has upper and lower bandwidth
+    `width - 1` and size `num_contribs * step + width - step`.
+    The value of `width` here must be at least `step`.
     """
-    assert contribs.shape[1] >= 1
+    assert contribs.shape[1] >= 1 and contribs.shape[1] >= step
     assert contribs.shape[2] == contribs.shape[1]
 
+    cdef unsigned long width = contribs.shape[1]
+    cdef unsigned long num_contribs = contribs.shape[0]
     cdef unsigned long depth = contribs.shape[1] - 1
-    cdef unsigned long width = depth + 1
-    cdef unsigned long size = contribs.shape[0]
+    cdef unsigned long mat_size = num_contribs * step + width - step
 
     if target_bm is None:
-        mat_bm = bm.zeros(depth, depth, size + depth)
+        mat_bm = bm.zeros(depth, depth, mat_size)
     else:
         assert target_bm.l == depth and target_bm.u == depth
-        assert target_bm.size == size + depth
+        assert target_bm.size == mat_size
         mat_bm = target_bm
 
     cdef unsigned long transposed = mat_bm.transposed
     cdef cnp.ndarray[cnp.float64_t, ndim=2] mat_data = mat_bm.data
 
-    cdef unsigned long frame, k, l
+    cdef unsigned long index, frame, k, l
 
     if transposed:
-        for frame in range(size):
+        for index in range(num_contribs):
+            frame = index * step
             for k in range(width):
                 for l in range(width):
-                    mat_data[depth + l - k, frame + k] += contribs[frame, k, l]
+                    mat_data[depth + l - k, frame + k] += contribs[index, k, l]
     else:
-        for frame in range(size):
+        for index in range(num_contribs):
+            frame = index * step
             for k in range(width):
                 for l in range(width):
-                    mat_data[depth + k - l, frame + l] += contribs[frame, k, l]
+                    mat_data[depth + k - l, frame + l] += contribs[index, k, l]
 
     if target_bm is None:
         return mat_bm
@@ -118,38 +126,44 @@ def sum_overlapping_m(cnp.ndarray[cnp.float64_t, ndim=3] contribs,
 
 @cython.boundscheck(False)
 def extract_overlapping_v(cnp.ndarray[cnp.float64_t, ndim=1] vec,
-                          unsigned long depth,
+                          unsigned long width,
+                          unsigned long step=1,
                           cnp.ndarray[cnp.float64_t, ndim=2] target=None):
     """Extracts overlapping subvectors from a vector.
 
     The result `subvectors` is a matrix consisting of a sequence of subvectors
     of `vec`.
-    Specifically `subvectors[i]` is `vec[i:(i + depth + 1)]`.
+    Specifically `subvectors[i]` is `vec[(i * step):(i * step + width)]`.
 
     If `target` is None then a new matrix is returned; otherwise the result is
     written to the matrix `target` (and all elements of `target` are guaranteed
     to be overwritten, so there is no need to zero it ahead of time).
-    If `vec` has shape (T + K,) where K is equal to `depth` then the returned
-    matrix (or `target` if specified) has shape (T, K + 1).
+    The length of `vec` should be `num_subs * step + width - step` for some
+    `num_subs`, i.e. it should "fit" a whole number of subvectors.
+    The returned matrix has shape `(num_subs, width)`.
+    The value of `width` here must be at least `step`.
     """
-    assert vec.shape[0] >= depth
+    assert step >= 1
+    assert width >= step
+    assert vec.shape[0] >= width - step
+    assert (vec.shape[0] + step - width) % step == 0
 
-    cdef unsigned long width = depth + 1
-    cdef unsigned long size = vec.shape[0] - depth
+    cdef unsigned long num_subs = (vec.shape[0] + step - width) // step
     cdef cnp.ndarray[cnp.float64_t, ndim=2] subvectors
 
     if target is None:
-        subvectors = np.empty((size, width), dtype=vec.dtype)
+        subvectors = np.empty((num_subs, width), dtype=vec.dtype)
     else:
-        assert target.shape[0] == size
+        assert target.shape[0] == num_subs
         assert target.shape[1] == width
         subvectors = target
 
-    cdef unsigned long frame, k
+    cdef unsigned long index, frame, k
 
-    for frame in range(size):
+    for index in range(num_subs):
+        frame = index * step
         for k in range(width):
-            subvectors[frame, k] = vec[frame + k]
+            subvectors[index, k] = vec[frame + k]
 
     if target is None:
         return subvectors
@@ -158,57 +172,69 @@ def extract_overlapping_v(cnp.ndarray[cnp.float64_t, ndim=1] vec,
 
 @cython.boundscheck(False)
 def extract_overlapping_m(mat_bm,
+                          unsigned long step=1,
                           cnp.ndarray[cnp.float64_t, ndim=3] target=None):
     """Extracts overlapping submatrices along the diagonal of a banded matrix.
 
     The result `submats` is rank-3 tensor consisting of a sequence of
     submatrices from along the diagonal of the matrix represented by `mat_bm`.
-    If `mat_full` is the matrix represented by `mat_bm` and `depth` is K above
-    then `submats[i]` is `mat_full[i:(i + depth + 1), i:(i + depth + 1)]`.
+    The upper and lower bandwidth of `mat_bm` should be the same.
+    Let `width` be `mat_bm.l + 1`.
+    If `mat_full` is the matrix represented by `mat_bm` then `submats[i]` is
+    `mat_full[(i * step):(i * step + width), (i * step):(i * step + width)]`.
 
     If `target` is None then a new tensor is returned; otherwise the result is
     written to the tensor `target` (and all elements of `target` are guaranteed
     to be overwritten, so there is no need to zero it ahead of time).
-    If `mat_bm` has size T + K and upper and lower bandwidth K then the
-    returned tensor (or `target` is specified) has shape (T, K + 1, K + 1).
+    The size of `mat_bm` should be `num_subs * step + width - step` for some
+    `num_subs`, i.e. it should "fit" a whole number of submatrices.
+    The returned matrix has shape `(num_subs, width, width)`.
+    The value of `width` here must be at least `step`.
     """
     assert mat_bm.l == mat_bm.u
-    assert mat_bm.size >= mat_bm.l
 
+    cdef unsigned long width = mat_bm.l + 1
+
+    assert step >= 1
+    assert width >= step
+    assert mat_bm.size >= width - step
+    assert (mat_bm.size + step - width) % step == 0
+
+    cdef unsigned long num_subs = (mat_bm.size + step - width) // step
     cdef unsigned long depth = mat_bm.l
-    cdef unsigned long width = depth + 1
-    cdef unsigned long size = mat_bm.size - depth
     cdef unsigned long transposed = mat_bm.transposed
     cdef cnp.ndarray[cnp.float64_t, ndim=2] mat_data = mat_bm.data
     cdef cnp.ndarray[cnp.float64_t, ndim=3] submats
 
     if target is None:
-        submats = np.empty((size, width, width), dtype=mat_data.dtype)
+        submats = np.empty((num_subs, width, width), dtype=mat_data.dtype)
     else:
-        assert target.shape[0] == size
+        assert target.shape[0] == num_subs
         assert target.shape[1] == width
         assert target.shape[2] == width
         submats = target
 
-    cdef unsigned long frame, k, l
+    cdef unsigned long index, frame, k, l
 
     if transposed:
-        for frame in range(size):
+        for index in range(num_subs):
+            frame = index * step
             for k in range(width):
                 for l in range(width):
-                    submats[frame, k, l] = mat_data[depth + l - k, frame + k]
+                    submats[index, k, l] = mat_data[depth + l - k, frame + k]
     else:
-        for frame in range(size):
+        for index in range(num_subs):
+            frame = index * step
             for k in range(width):
                 for l in range(width):
-                    submats[frame, k, l] = mat_data[depth + k - l, frame + l]
+                    submats[index, k, l] = mat_data[depth + k - l, frame + l]
 
     if target is None:
         return submats
     else:
         return
 
-def sum_overlapping_v_chunked(contribs_chunks, depth, target):
+def sum_overlapping_v_chunked(contribs_chunks, width, target, step=1):
     """A chunked version of sum_overlapping_v.
 
     The elements of the iterator `contribs_chunks` should be of the form
@@ -224,14 +250,18 @@ def sum_overlapping_v_chunked(contribs_chunks, depth, target):
     This can be used to construct more memory-efficient code in some cases
     (though not in the above example).
     """
-    assert depth >= 0
-    size = len(target) - depth
-    assert size >= 0
+    assert step >= 0
+    overlap = width - step
+    assert overlap >= 0
 
     for start, end, contribs in contribs_chunks:
-        sum_overlapping_v(contribs, target=target[start:(end + depth)])
+        sum_overlapping_v(
+            contribs,
+            step=step,
+            target=target[(start * step):(end * step + overlap)]
+        )
 
-def sum_overlapping_m_chunked(contribs_chunks, target_bm):
+def sum_overlapping_m_chunked(contribs_chunks, target_bm, step=1):
     """A chunked version of sum_overlapping_m.
 
     The elements of the iterator `contribs_chunks` should be of the form
@@ -247,50 +277,66 @@ def sum_overlapping_m_chunked(contribs_chunks, target_bm):
     This can be used to construct more memory-efficient code in some cases
     (though not in the above example).
     """
+    assert step >= 0
     depth = target_bm.l
     assert target_bm.u == depth
-    size = target_bm.size - depth
-    assert size >= 0
+    width = depth + 1
+    overlap = width - step
+    assert overlap >= 0
 
     for start, end, contribs in contribs_chunks:
         sum_overlapping_m(
             contribs,
-            target_bm=target_bm.sub_matrix_view(start, end + depth)
+            step=step,
+            target_bm=target_bm.sub_matrix_view(
+                start * step, end * step + overlap
+            )
         )
 
-def extract_overlapping_v_chunked(vec, depth, chunk_size):
+def extract_overlapping_v_chunked(vec, width, chunk_size, step=1):
     """A chunked version of extract_overlapping_v.
 
     An iterator over chunks of the output of extract_overlapping_v is returned.
     This can be used to construct more memory-efficient code in some cases.
     """
-    size = len(vec) - depth
-    assert size >= 0
+    assert step >= 1
+    overlap = width - step
+    assert overlap >= 0
+    num_subs = (len(vec) - overlap) // step
+    assert num_subs * step + overlap == len(vec)
+    assert num_subs >= 0
     assert chunk_size >= 1
 
-    for start in range(0, size, chunk_size):
-        end = min(start + chunk_size, size)
+    for start in range(0, num_subs, chunk_size):
+        end = min(start + chunk_size, num_subs)
         subvectors = extract_overlapping_v(
-            vec[start:(end + depth)],
-            depth
+            vec[(start * step):(end * step + overlap)],
+            width,
+            step=step
         )
         yield start, end, subvectors
 
-def extract_overlapping_m_chunked(mat_bm, chunk_size):
+def extract_overlapping_m_chunked(mat_bm, chunk_size, step=1):
     """A chunked version of extract_overlapping_m.
 
     An iterator over chunks of the output of extract_overlapping_m is returned.
     This can be used to construct more memory-efficient code in some cases.
     """
+    assert step >= 1
     depth = mat_bm.l
     assert mat_bm.u == depth
-    size = mat_bm.size - depth
-    assert size >= 0
+    width = depth + 1
+    overlap = width - step
+    assert overlap >= 0
+    num_subs = (mat_bm.size - overlap) // step
+    assert num_subs * step + overlap == mat_bm.size
+    assert num_subs >= 0
     assert chunk_size >= 1
 
-    for start in range(0, size, chunk_size):
-        end = min(start + chunk_size, size)
+    for start in range(0, num_subs, chunk_size):
+        end = min(start + chunk_size, num_subs)
         submats = extract_overlapping_m(
-            mat_bm.sub_matrix_view(start, end + depth)
+            mat_bm.sub_matrix_view(start * step, end * step + overlap),
+            step=step
         )
         yield start, end, submats
