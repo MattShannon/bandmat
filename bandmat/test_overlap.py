@@ -94,15 +94,13 @@ class TestOverlap(unittest.TestCase):
             size = random.choice([0, 1, randint(10), randint(100)])
             depth = random.choice([0, 1, randint(0, 10)])
             mat_bm = gen_BandMat(size + depth, l=depth, u=depth)
-            mat_full = mat_bm.full()
 
             submats = bmo.extract_overlapping_m(mat_bm)
             assert submats.shape == (size, depth + 1, depth + 1)
             for frame in range(size):
                 assert_allequal(
                     submats[frame],
-                    mat_full[frame:(frame + depth + 1),
-                             frame:(frame + depth + 1)]
+                    mat_bm.sub_matrix_view(frame, frame + depth + 1).full()
                 )
 
 if __name__ == '__main__':
