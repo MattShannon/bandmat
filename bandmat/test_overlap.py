@@ -21,6 +21,17 @@ cc = bm.band_e_bm_common
 def rand_bool():
     return randint(0, 2) == 0
 
+def chunk_randomly(xs):
+    size = len(xs)
+
+    num_divs = random.choice([0, randint(size // 2 + 1), randint(size + 3)])
+    divs = [0] + sorted(
+        [ randint(size + 1) for _ in range(num_divs) ]
+    ) + [size]
+
+    for start, end in zip(divs, divs[1:]):
+        yield start, end, xs[start:end]
+
 class TestOverlap(unittest.TestCase):
     def test_sum_overlapping_v(self, its=50):
         for it in range(its):
@@ -134,6 +145,74 @@ class TestOverlap(unittest.TestCase):
                     submats[frame],
                     mat_bm.sub_matrix_view(frame, frame + depth + 1).full()
                 )
+
+    def test_sum_overlapping_v_chunked(self, its=50):
+        for it in range(its):
+            size = random.choice([0, 1, randint(10), randint(100)])
+            depth = random.choice([0, 1, randint(0, 10)])
+            contribs = randn(size, depth + 1)
+            contribs_chunks = chunk_randomly(contribs)
+            target = randn(size + depth)
+            target_orig = target.copy()
+
+            bmo.sum_overlapping_v_chunked(contribs_chunks, depth, target)
+            vec_good = bmo.sum_overlapping_v(contribs)
+            assert_allclose(target, target_orig + vec_good)
+
+    def test_sum_overlapping_m_chunked(self, its=50):
+        for it in range(its):
+            size = random.choice([0, 1, randint(10), randint(100)])
+            depth = random.choice([0, 1, randint(0, 10)])
+            contribs = randn(size, depth + 1, depth + 1)
+            contribs_chunks = chunk_randomly(contribs)
+            target_bm = gen_BandMat(size + depth, l=depth, u=depth)
+            target_bm_orig = target_bm.copy()
+
+            bmo.sum_overlapping_m_chunked(contribs_chunks, target_bm)
+            mat_bm_good = bmo.sum_overlapping_m(contribs)
+            assert_allclose(*cc(target_bm, target_bm_orig + mat_bm_good))
+
+    def test_extract_overlapping_v_chunked(self, its=50):
+        for it in range(its):
+            size = random.choice([0, 1, randint(10), randint(100)])
+            depth = random.choice([0, 1, randint(0, 10)])
+            vec = randn(size + depth)
+            chunk_size = depth + random.choice([1, randint(1, 10)])
+
+            indices_remaining = set(range(size))
+            subvectors_all = np.empty((size, depth + 1))
+            for start, end, subvectors in bmo.extract_overlapping_v_chunked(
+                vec, depth, chunk_size
+            ):
+                assert end >= start + 1
+                for index in range(start, end):
+                    assert index in indices_remaining
+                    indices_remaining.remove(index)
+                subvectors_all[start:end] = subvectors
+
+            subvectors_good = bmo.extract_overlapping_v(vec, depth)
+            assert_allclose(subvectors_all, subvectors_good)
+
+    def test_extract_overlapping_m_chunked(self, its=50):
+        for it in range(its):
+            size = random.choice([0, 1, randint(10), randint(100)])
+            depth = random.choice([0, 1, randint(0, 10)])
+            mat_bm = gen_BandMat(size + depth, l=depth, u=depth)
+            chunk_size = depth + random.choice([1, randint(1, 10)])
+
+            indices_remaining = set(range(size))
+            submats_all = np.empty((size, depth + 1, depth + 1))
+            for start, end, submats in bmo.extract_overlapping_m_chunked(
+                mat_bm, chunk_size
+            ):
+                assert end >= start + 1
+                for index in range(start, end):
+                    assert index in indices_remaining
+                    indices_remaining.remove(index)
+                submats_all[start:end] = submats
+
+            submats_good = bmo.extract_overlapping_m(mat_bm)
+            assert_allclose(submats_all, submats_good)
 
 if __name__ == '__main__':
     unittest.main()

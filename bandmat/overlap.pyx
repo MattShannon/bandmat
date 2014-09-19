@@ -207,3 +207,90 @@ def extract_overlapping_m(mat_bm,
         return submats
     else:
         return
+
+def sum_overlapping_v_chunked(contribs_chunks, depth, target):
+    """A chunked version of sum_overlapping_v.
+
+    The elements of the iterator `contribs_chunks` should be of the form
+    `(start, end, contribs)`.
+    For example if `contribs_all` has length 10 then
+
+        sum_overlapping_v_chunked([
+            (0, 3, contribs_all[0:3]),
+            (3, 10, contribs_all[3:10])
+        ])
+
+    produces the same result as `sum_overlapping_v(contribs_all)`.
+    This can be used to construct more memory-efficient code in some cases
+    (though not in the above example).
+    """
+    assert depth >= 0
+    size = len(target) - depth
+    assert size >= 0
+
+    for start, end, contribs in contribs_chunks:
+        sum_overlapping_v(contribs, target=target[start:(end + depth)])
+
+def sum_overlapping_m_chunked(contribs_chunks, target_bm):
+    """A chunked version of sum_overlapping_m.
+
+    The elements of the iterator `contribs_chunks` should be of the form
+    `(start, end, contribs)`.
+    For example if `contribs_all` has length 10 then
+
+        sum_overlapping_m_chunked([
+            (0, 3, contribs_all[0:3]),
+            (3, 10, contribs_all[3:10])
+        ])
+
+    produces the same result as `sum_overlapping_m(contribs_all)`.
+    This can be used to construct more memory-efficient code in some cases
+    (though not in the above example).
+    """
+    depth = target_bm.l
+    assert target_bm.u == depth
+    size = target_bm.size - depth
+    assert size >= 0
+
+    for start, end, contribs in contribs_chunks:
+        sum_overlapping_m(
+            contribs,
+            target_bm=target_bm.sub_matrix_view(start, end + depth)
+        )
+
+def extract_overlapping_v_chunked(vec, depth, chunk_size):
+    """A chunked version of extract_overlapping_v.
+
+    An iterator over chunks of the output of extract_overlapping_v is returned.
+    This can be used to construct more memory-efficient code in some cases.
+    """
+    size = len(vec) - depth
+    assert size >= 0
+    assert chunk_size >= depth + 1
+
+    for start in range(0, size, chunk_size):
+        end = min(start + chunk_size, size)
+        subvectors = extract_overlapping_v(
+            vec[start:(end + depth)],
+            depth
+        )
+        yield start, end, subvectors
+
+def extract_overlapping_m_chunked(mat_bm, chunk_size):
+    """A chunked version of extract_overlapping_m.
+
+    An iterator over chunks of the output of extract_overlapping_m is returned.
+    This can be used to construct more memory-efficient code in some cases.
+    """
+    depth = mat_bm.l
+    assert mat_bm.u == depth
+    size = mat_bm.size - depth
+    assert size >= 0
+    assert chunk_size >= depth + 1
+
+    for start in range(0, size, chunk_size):
+        end = min(start + chunk_size, size)
+        submats = extract_overlapping_m(
+            mat_bm.sub_matrix_view(start, end + depth)
+        )
+        yield start, end, submats
