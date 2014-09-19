@@ -266,7 +266,7 @@ def extract_overlapping_v_chunked(vec, depth, chunk_size):
     """
     size = len(vec) - depth
     assert size >= 0
-    assert chunk_size >= depth + 1
+    assert chunk_size >= 1
 
     for start in range(0, size, chunk_size):
         end = min(start + chunk_size, size)
@@ -286,7 +286,7 @@ def extract_overlapping_m_chunked(mat_bm, chunk_size):
     assert mat_bm.u == depth
     size = mat_bm.size - depth
     assert size >= 0
-    assert chunk_size >= depth + 1
+    assert chunk_size >= 1
 
     for start in range(0, size, chunk_size):
         end = min(start + chunk_size, size)

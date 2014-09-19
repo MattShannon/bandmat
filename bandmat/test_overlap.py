@@ -177,7 +177,7 @@ class TestOverlap(unittest.TestCase):
             size = random.choice([0, 1, randint(10), randint(100)])
             depth = random.choice([0, 1, randint(0, 10)])
             vec = randn(size + depth)
-            chunk_size = depth + random.choice([1, randint(1, 10)])
+            chunk_size = random.choice([1, randint(1, 10), randint(1, 10)])
 
             indices_remaining = set(range(size))
             subvectors_all = np.empty((size, depth + 1))
@@ -198,7 +198,7 @@ class TestOverlap(unittest.TestCase):
             size = random.choice([0, 1, randint(10), randint(100)])
             depth = random.choice([0, 1, randint(0, 10)])
             mat_bm = gen_BandMat(size + depth, l=depth, u=depth)
-            chunk_size = depth + random.choice([1, randint(1, 10)])
+            chunk_size = random.choice([1, randint(1, 10), randint(1, 10)])
 
             indices_remaining = set(range(size))
             submats_all = np.empty((size, depth + 1, depth + 1))
