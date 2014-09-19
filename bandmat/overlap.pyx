@@ -87,35 +87,25 @@ def extract_overlapping_v(cnp.ndarray[cnp.float64_t, ndim=1] vec,
                           unsigned long depth):
     """Extracts overlapping subvectors from a vector.
 
-    If `vec` has shape (T,) where K is equal to `depth` then a matrix of shape
-    (T + K, K + 1) is returned.
-    The returned matrix is a sequence of subvectors of `vec`.
+    If `vec` has shape (T + K,) where K is equal to `depth` then a matrix of
+    shape (T, K + 1) is returned.
+
+    The returned matrix `subvectors` is a sequence of subvectors of `vec`.
+    Specifically `subvectors[i]` is `vec[i:(i + depth + 1)]`.
     """
+    assert vec.shape[0] >= depth
+
     cdef unsigned long width = depth + 1
-    cdef unsigned long size = vec.shape[0]
+    cdef unsigned long size = vec.shape[0] - depth
     cdef cnp.ndarray[cnp.float64_t, ndim=2] subvectors = (
-        np.empty((size + depth, width), dtype=vec.dtype)
+        np.empty((size, width), dtype=vec.dtype)
     )
 
     cdef unsigned long frame, k
 
-    for frame in range(0, depth):
+    for frame in range(size):
         for k in range(width):
-            if frame + k >= depth and frame + k < size + depth:
-                subvectors[frame, k] = vec[frame + k - depth]
-            else:
-                subvectors[frame, k] = 0.0
-
-    for frame in range(depth, size):
-        for k in range(width):
-            subvectors[frame, k] = vec[frame + k - depth]
-
-    for frame in range(size, size + depth):
-        for k in range(width):
-            if frame + k >= depth and frame + k < size + depth:
-                subvectors[frame, k] = vec[frame + k - depth]
-            else:
-                subvectors[frame, k] = 0.0
+            subvectors[frame, k] = vec[frame + k]
 
     return subvectors
 
@@ -123,94 +113,37 @@ def extract_overlapping_v(cnp.ndarray[cnp.float64_t, ndim=1] vec,
 def extract_overlapping_m(mat_bm):
     """Extracts overlapping submatrices along the diagonal of a banded matrix.
 
-    If `mat_bm` has size T and upper and lower bandwidth K then a tensor of
-    shape (T + K, K + 1, K + 1) is returned.
-    The returned tensor is a sequence of submatrices from along the diagonal of
-    the matrix represented by `mat_bm`.
+    If `mat_bm` has size T + K and upper and lower bandwidth K then a tensor of
+    shape (T, K + 1, K + 1) is returned.
+
+    The returned tensor `submats` is a sequence of submatrices from along the
+    diagonal of the matrix represented by `mat_bm`.
+    If `mat_full` is the matrix represented by `mat_bm` and `depth` is K above
+    then `submats[i]` is `mat_full[i:(i + depth + 1), i:(i + depth + 1)]`.
     """
     assert mat_bm.l == mat_bm.u
+    assert mat_bm.size >= mat_bm.l
 
     cdef unsigned long depth = mat_bm.l
     cdef unsigned long width = depth + 1
-    cdef unsigned long size = mat_bm.size
+    cdef unsigned long size = mat_bm.size - depth
     cdef unsigned long transposed = mat_bm.transposed
     cdef cnp.ndarray[cnp.float64_t, ndim=2] mat_data = mat_bm.data
     cdef cnp.ndarray[cnp.float64_t, ndim=3] submats = (
-        np.empty((size + depth, width, width), dtype=mat_data.dtype)
+        np.empty((size, width, width), dtype=mat_data.dtype)
     )
 
     cdef unsigned long frame, k, l
 
     if transposed:
-        for frame in range(0, depth):
-            for k in range(width):
-                if frame + k >= depth and frame + k < size + depth:
-                    for l in range(width):
-                        if frame + l >= depth and frame + l < size + depth:
-                            submats[frame, l, k] = (
-                                mat_data[depth + k - l, frame + l - depth]
-                            )
-                        else:
-                            submats[frame, l, k] = 0.0
-                else:
-                    for l in range(width):
-                        submats[frame, l, k] = 0.0
-
-        for frame in range(depth, size):
+        for frame in range(size):
             for k in range(width):
                 for l in range(width):
-                    submats[frame, l, k] = (
-                        mat_data[depth + k - l, frame + l - depth]
-                    )
-
-        for frame in range(size, size + depth):
-            for k in range(width):
-                if frame + k >= depth and frame + k < size + depth:
-                    for l in range(width):
-                        if frame + l >= depth and frame + l < size + depth:
-                            submats[frame, l, k] = (
-                                mat_data[depth + k - l, frame + l - depth]
-                            )
-                        else:
-                            submats[frame, l, k] = 0.0
-                else:
-                    for l in range(width):
-                        submats[frame, l, k] = 0.0
-
+                    submats[frame, l, k] = mat_data[depth + k - l, frame + l]
     else:
-        for frame in range(0, depth):
-            for k in range(width):
-                if frame + k >= depth and frame + k < size + depth:
-                    for l in range(width):
-                        if frame + l >= depth and frame + l < size + depth:
-                            submats[frame, k, l] = (
-                                mat_data[depth + k - l, frame + l - depth]
-                            )
-                        else:
-                            submats[frame, k, l] = 0.0
-                else:
-                    for l in range(width):
-                        submats[frame, k, l] = 0.0
-
-        for frame in range(depth, size):
+        for frame in range(size):
             for k in range(width):
                 for l in range(width):
-                    submats[frame, k, l] = (
-                        mat_data[depth + k - l, frame + l - depth]
-                    )
-
-        for frame in range(size, size + depth):
-            for k in range(width):
-                if frame + k >= depth and frame + k < size + depth:
-                    for l in range(width):
-                        if frame + l >= depth and frame + l < size + depth:
-                            submats[frame, k, l] = (
-                                mat_data[depth + k - l, frame + l - depth]
-                            )
-                        else:
-                            submats[frame, k, l] = 0.0
-                else:
-                    for l in range(width):
-                        submats[frame, k, l] = 0.0
+                    submats[frame, k, l] = mat_data[depth + k - l, frame + l]
 
     return submats
