@@ -5,6 +5,8 @@ This package provides a simple banded matrix library for python.
 It supports banded matrix-vector and matrix-matrix multiplication, converting
 between full and banded matrix representations, and certain linear algebra
 operations on banded matrices.
+It builds on the excellent numpy and scipy packages, which have limited support
+for banded matrix operations.
 
 Overview
 --------
