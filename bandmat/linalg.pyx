@@ -12,7 +12,7 @@ symmetric "full" (i.e. non-banded) matrices, where both the upper and lower
 triangles are represented in memory.
 """
 
-# Copyright 2013, 2014 Matt Shannon
+# Copyright 2013, 2014, 2015 Matt Shannon
 
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
