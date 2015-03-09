@@ -5,14 +5,13 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
-from bandmat.testhelp import assert_allclose, assert_allequal, get_array_mem
-
-import bandmat.full as fl
-
 import unittest
 import numpy as np
 import random
 from numpy.random import randn, randint
+
+import bandmat.full as fl
+from bandmat.testhelp import assert_allclose, assert_allequal, get_array_mem
 
 class TestFull(unittest.TestCase):
     def test_band_c_basis(self, its=100):

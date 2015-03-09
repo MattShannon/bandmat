@@ -5,16 +5,15 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
-from bandmat.testhelp import assert_allclose, get_array_mem
-from bandmat.test_core import gen_BandMat
-
-import bandmat as bm
-import bandmat.full as fl
-
 import unittest
 import numpy as np
 import random
 from numpy.random import randn, randint
+
+import bandmat as bm
+import bandmat.full as fl
+from bandmat.testhelp import assert_allclose, get_array_mem
+from bandmat.test_core import gen_BandMat
 
 def rand_bool():
     return randint(0, 2) == 0

@@ -5,13 +5,6 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
-from bandmat.testhelp import assert_allclose, randomize_extra_entries_bm
-from bandmat.test_core import gen_BandMat
-
-import bandmat as bm
-import bandmat.full as fl
-import bandmat.linalg as bla
-
 import unittest
 import re
 import numpy as np
@@ -19,6 +12,12 @@ import numpy.linalg as la
 import scipy.linalg as sla
 import random
 from numpy.random import randn, randint
+
+import bandmat as bm
+import bandmat.full as fl
+import bandmat.linalg as bla
+from bandmat.testhelp import assert_allclose, randomize_extra_entries_bm
+from bandmat.test_core import gen_BandMat
 
 def rand_bool():
     return randint(0, 2) == 0

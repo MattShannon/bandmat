@@ -5,16 +5,15 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
-from bandmat.testhelp import assert_allclose, assert_allequal
-from bandmat.test_core import gen_BandMat
-
-import bandmat as bm
-import bandmat.overlap as bmo
-
 import unittest
 import numpy as np
 import random
 from numpy.random import randn, randint
+
+import bandmat as bm
+import bandmat.overlap as bmo
+from bandmat.testhelp import assert_allclose, assert_allequal
+from bandmat.test_core import gen_BandMat
 
 cc = bm.band_e_bm_common
 

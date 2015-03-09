@@ -5,15 +5,15 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
-import bandmat as bm
-import bandmat.full as fl
-import bandmat.testhelp as th
-
 import unittest
 import doctest
 import numpy as np
 import random
 from numpy.random import randn, randint
+
+import bandmat as bm
+import bandmat.full as fl
+import bandmat.testhelp as th
 
 def rand_bool():
     return randint(0, 2) == 0

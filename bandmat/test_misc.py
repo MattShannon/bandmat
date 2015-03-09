@@ -5,14 +5,13 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
-from bandmat.testhelp import assert_allclose, get_array_mem
-
-from bandmat.misc import fancy_plus_equals, fancy_plus_equals_2d
-from bandmat.misc import fancy_plus_equals_3d
-
 import unittest
 import random
 from numpy.random import randn, randint
+
+from bandmat.misc import fancy_plus_equals, fancy_plus_equals_2d
+from bandmat.misc import fancy_plus_equals_3d
+from bandmat.testhelp import assert_allclose, get_array_mem
 
 def rand_bool():
     return randint(0, 2) == 0

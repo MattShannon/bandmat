@@ -19,10 +19,10 @@ The mean trajectory is also the most likely or maximum probability trajectory.
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
+import numpy as np
+
 import bandmat as bm
 import bandmat.linalg as bla
-
-import numpy as np
 
 def build_win_mats(windows, frames):
     """Builds a window matrix of a given size for each window in a collection.

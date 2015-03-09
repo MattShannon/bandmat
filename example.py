@@ -7,6 +7,7 @@
 # See `License` for details of license and warranty.
 
 import numpy as np
+
 import bandmat as bm
 
 a_bm = bm.BandMat(
