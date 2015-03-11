@@ -62,8 +62,8 @@ setup(
     author='Matt Shannon',
     author_email='matt.shannon@cantab.net',
     license='3-clause BSD (see License file)',
-    packages = ['bandmat'],
-    long_description = long_description,
-    cmdclass = cmdclass,
-    ext_modules = ext_modules,
+    packages=['bandmat'],
+    long_description=long_description,
+    cmdclass=cmdclass,
+    ext_modules=ext_modules,
 )
