@@ -49,15 +49,23 @@ bandmat.
 Installation
 ------------
 
-For most purposes the simplest way to install bandmat is to use pip::
+For most purposes the simplest way to install bandmat is to use pip.
+For example in Debian and Ubuntu::
 
+    sudo apt-get install python-numpy python-scipy
     sudo pip install bandmat
 
-This installs the latest released version of
-`bandmat on PyPI <https://pypi.python.org/pypi/bandmat>`_.
-Alternatively you can download bandmat from PyPI and install it using::
+The first command installs numpy and scipy from the system repository, since
+installing numpy and scipy using pip is generally not recommended.
+The second command installs the latest released version of
+`bandmat on PyPI <https://pypi.python.org/pypi/bandmat>`_, together with any
+currently uninstalled python packages required by bandmat.
 
-    sudo python setup.py install
+bandmat can also be installed in a virtualenv::
+
+    sudo apt-get install python-numpy python-scipy
+    virtualenv --system-site-packages env
+    env/bin/pip install bandmat
 
 The latest development version of bandmat is available from a github repository
 (see below).
@@ -88,6 +96,11 @@ To obtain the latest source code using git::
 Development is in fact done using `darcs <http://darcs.net/>`_, with the darcs
 repository converted to a git repository using
 `darcs-to-git <https://github.com/purcell/darcs-to-git>`_.
+
+To install any currently uninstalled python packages required by bandmat::
+
+    sudo apt-get install cython python-numpy python-scipy
+    sudo pip install -r requirements.txt
 
 To compile the cython part of bandmat in the current directory::
 
