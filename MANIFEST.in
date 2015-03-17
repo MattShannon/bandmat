@@ -1,5 +1,6 @@
 include License
 include README.rst
+include requirements.txt
 include bandmat/*.c
 include example.py
 include example_spg.py
