@@ -1,6 +1,6 @@
 """Core banded matrix definitions and functions."""
 
-# Copyright 2013, 2014, 2015 Matt Shannon
+# Copyright 2013, 2014, 2015, 2016, 2017 Matt Shannon
 
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
