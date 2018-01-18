@@ -11,6 +11,7 @@ import numpy as np
 from setuptools import setup
 from setuptools.extension import Extension
 from setuptools.command.sdist import sdist as _sdist
+import platform
 
 cython_locs = [
     ('bandmat', 'full'),
@@ -24,10 +25,15 @@ cython_locs = [
 with open('README.rst') as readme_file:
     long_description = readme_file.read()
 
-requires = [ line.rstrip('\n') for line in open('requirements.txt') ]
+requires = [line.rstrip('\n') for line in open('requirements.txt')]
 
 # see "A note on setup.py" in README.rst for an explanation of the dev file
 dev_mode = os.path.exists('dev')
+
+if platform.system() == "Windows":
+    extra_compile_args = []
+else:
+    extra_compile_args = ['-Wno-unused-but-set-variable', '-O3']
 
 if dev_mode:
     from Cython.Distutils import build_ext
@@ -39,22 +45,23 @@ if dev_mode:
         This class is a custom sdist command which ensures all cython-generated
         C files are up-to-date before running the conventional sdist command.
         """
+
         def run(self):
-            cythonize([ os.path.join(*loc)+'.pyx' for loc in cython_locs ])
+            cythonize([os.path.join(*loc) + '.pyx' for loc in cython_locs])
             _sdist.run(self)
 
     cmdclass = {'build_ext': build_ext, 'sdist': sdist}
     ext_modules = [
-        Extension('.'.join(loc), [os.path.join(*loc)+'.pyx'],
-                  extra_compile_args=['-Wno-unused-but-set-variable', '-O3'],
+        Extension('.'.join(loc), [os.path.join(*loc) + '.pyx'],
+                  extra_compile_args=extra_compile_args,
                   include_dirs=[np.get_include()])
         for loc in cython_locs
     ]
 else:
     cmdclass = {}
     ext_modules = [
-        Extension('.'.join(loc), [os.path.join(*loc)+'.c'],
-                  extra_compile_args=['-Wno-unused-but-set-variable', '-O3'],
+        Extension('.'.join(loc), [os.path.join(*loc) + '.c'],
+                  extra_compile_args=extra_compile_args,
                   include_dirs=[np.get_include()])
         for loc in cython_locs
     ]
