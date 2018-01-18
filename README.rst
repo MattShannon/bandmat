@@ -1,6 +1,12 @@
 bandmat
 =======
 
+|Travis Build Status| |AppVeyor Build Status|
+
+.. |Travis Build Status| image:: https://travis-ci.org/r9y9/bandmat.svg?branch=master 
+.. |AppVeyor Build Status| image:: https://ci.appveyor.com/api/projects/status/5450u3ngh9vn01op?svg=true
+
+
 This package provides a simple banded matrix library for python.
 It supports banded matrix-vector and matrix-matrix multiplication, converting
 between full and banded matrix representations, and certain linear algebra
