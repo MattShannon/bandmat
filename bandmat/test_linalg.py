@@ -123,7 +123,9 @@ class TestLinAlg(unittest.TestCase):
                     mat_half_data_arg, overwrite_ab=overwrite, lower=lower
                 )
             except la.LinAlgError as e:
-                msgRe = '^' + re.escape(str(e)) + '$'
+                # First part of the message is e.g. "2-th leading minor".
+                msgRe = (r'^' + re.escape(str(e)[:15]) +
+                         r'.*not positive definite$')
                 with self.assertRaisesRegexp(la.LinAlgError, msgRe):
                     sla.cholesky(mat_bm.full(), lower=lower)
             else:
