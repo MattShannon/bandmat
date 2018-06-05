@@ -7,6 +7,7 @@
 
 import unittest
 import doctest
+import sys
 import numpy as np
 import random
 from numpy.random import randn, randint
@@ -368,12 +369,14 @@ class TestCore(unittest.TestCase):
             assert_allclose(b_bm.full(), b_full)
             assert not np.may_share_memory(b_bm.data, a_bm.data)
 
-            b_bm = a_bm.__div__(mult)
-            b_full = a_full.__div__(mult)
-            assert b_bm.l == a_bm.l
-            assert b_bm.u == a_bm.u
-            assert_allclose(b_bm.full(), b_full)
-            assert not np.may_share_memory(b_bm.data, a_bm.data)
+            # __div__ does not exist in python3
+            if sys.version_info[0] < 3:
+                b_bm = a_bm.__div__(mult)
+                b_full = a_full.__div__(mult)
+                assert b_bm.l == a_bm.l
+                assert b_bm.u == a_bm.u
+                assert_allclose(b_bm.full(), b_full)
+                assert not np.may_share_memory(b_bm.data, a_bm.data)
 
             b_bm = a_bm.__truediv__(mult)
             b_full = a_full.__truediv__(mult)
@@ -436,13 +439,15 @@ class TestCore(unittest.TestCase):
             assert_allclose(a_bm.full(), a_full)
             assert get_array_mem(a_bm.data) == array_mem
 
-            a_bm = gen_BandMat(size)
-            a_full = a_bm.full()
-            array_mem = get_array_mem(a_bm.data)
-            a_bm.__idiv__(mult)
-            a_full.__idiv__(mult)
-            assert_allclose(a_bm.full(), a_full)
-            assert get_array_mem(a_bm.data) == array_mem
+            # __idiv__ does not exist in python3
+            if sys.version_info[0] < 3:
+                a_bm = gen_BandMat(size)
+                a_full = a_bm.full()
+                array_mem = get_array_mem(a_bm.data)
+                a_bm.__idiv__(mult)
+                a_full.__idiv__(mult)
+                assert_allclose(a_bm.full(), a_full)
+                assert get_array_mem(a_bm.data) == array_mem
 
             a_bm = gen_BandMat(size)
             a_full = a_bm.full()
