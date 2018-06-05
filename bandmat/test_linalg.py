@@ -137,7 +137,7 @@ class TestLinAlg(unittest.TestCase):
                 assert_allclose(mat_bm_again.full(), mat_bm.full())
 
                 if size > 0:
-                    self.assertEquals(
+                    self.assertEqual(
                         np.may_share_memory(chol_data, mat_half_data_arg),
                         overwrite
                     )
@@ -196,7 +196,7 @@ class TestLinAlg(unittest.TestCase):
                 assert_allclose(x, x_good)
                 assert not np.may_share_memory(x, chol_data)
                 if size > 0:
-                    self.assertEquals(
+                    self.assertEqual(
                         np.may_share_memory(x, b_arg),
                         overwrite_b
                     )
