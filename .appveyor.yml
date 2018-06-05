@@ -17,10 +17,10 @@ environment:
       MINICONDA: "C:\\Miniconda3-x64"
 
 init:
+  - ps: .\.appveyor_update_version.ps1
   - "ECHO %PYTHON_VERSION% %PYTHON_ARCH% %MINICONDA%"
 
 install:
-  - ps: .\.appveyor_update_version.ps1
   - "SET PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
