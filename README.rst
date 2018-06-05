@@ -108,7 +108,7 @@ repository converted to a git repository using
 
 To install any currently uninstalled python packages required by bandmat::
 
-    sudo apt-get install cython python-numpy python-scipy
+    sudo apt-get install cython cython3 python-numpy python-scipy
     sudo pip install -r requirements.txt
 
 To compile the cython part of bandmat in the current directory::

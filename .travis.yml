@@ -9,7 +9,7 @@ virtualenv:
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get -qq install cython python-numpy python-scipy
+  - sudo apt-get -qq install cython cython3 python-numpy python-scipy
 
 install:
   - pip install -r requirements.txt
