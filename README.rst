@@ -1,6 +1,15 @@
 bandmat
 =======
 
+|Linux build status| |Windows build status|
+
+.. |Linux build status| image:: https://travis-ci.org/MattShannon/bandmat.svg?branch=master
+   :alt: Linux build status
+   :target: https://travis-ci.org/MattShannon/bandmat
+.. |Windows build status| image:: https://ci.appveyor.com/api/projects/status/cy8ouawd9bnus0ai/branch/master?svg=true
+   :alt: Windows build status
+   :target: https://ci.appveyor.com/project/MattShannon/bandmat/branch/master
+
 This package provides a simple banded matrix library for python.
 It supports banded matrix-vector and matrix-matrix multiplication, converting
 between full and banded matrix representations, and certain linear algebra
