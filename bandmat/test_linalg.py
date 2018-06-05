@@ -271,7 +271,7 @@ class TestLinAlg(unittest.TestCase):
 
     def test_solve(self, its=50):
         for it in range(its):
-            size = random.choice([1, randint(1, 10), randint(1, 100)])
+            size = random.choice([2, randint(2, 10), randint(2, 100)])
             b = randn(size)
             l = random.choice([1, randint(1, 10)])
             u = random.choice([1, randint(1, 10)])
