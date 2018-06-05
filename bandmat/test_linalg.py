@@ -271,15 +271,10 @@ class TestLinAlg(unittest.TestCase):
 
     def test_solve(self, its=50):
         for it in range(its):
-            size = random.choice([2, randint(2, 10), randint(2, 100)])
+            size = random.choice([0, 1, randint(0, 10), randint(0, 100)])
             b = randn(size)
-            l = random.choice([1, randint(1, 10)])
-            u = random.choice([1, randint(1, 10)])
-            while l == u == 1:
-                l = random.choice([1, randint(1, 10)])
-                u = random.choice([1, randint(1, 10)])
             # the below tries to ensure the matrix is well-conditioned
-            a_bm = gen_BandMat(size, l=l, u=u) + bm.diag(np.ones((size,)) * 10.0)
+            a_bm = gen_BandMat(size) + bm.diag(np.ones((size,)) * 10.0)
             a_full = a_bm.full()
 
             x = bla.solve(a_bm, b)
