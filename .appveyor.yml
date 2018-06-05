@@ -16,3 +16,6 @@ install:
 
 build_script:
   - pip install -e .
+
+test_script:
+  - python -m unittest discover bandmat
