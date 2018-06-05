@@ -115,6 +115,7 @@ class TestTestHelp(unittest.TestCase):
                     # FIXME : re-enable once I understand better when this may
                     #   fail (i.e. when memory may be unexpectedly shared).
                     #assert th.get_array_mem(x) != array_mem
+                    pass
 
 if __name__ == '__main__':
     unittest.main()
