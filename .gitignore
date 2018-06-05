@@ -1,5 +1,6 @@
 .git/
 _darcs/
+bandmat.egg-info/
 build/
 dist/
 env/
