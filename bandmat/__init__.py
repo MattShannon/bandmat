@@ -45,14 +45,19 @@ Examples
 Define a banded matrix:
 >>> import numpy as np
 >>> import bandmat as bm
+>>> # Ensure consistent formatting between old and new versions of numpy.
+>>> try:
+...   np.set_printoptions(legacy='1.13')
+... except TypeError:
+...   pass
 >>> a_bm = bm.BandMat(1, 1, np.arange(15, dtype=np.float64).reshape((3, 5)))
->>> print(a_bm.data)  # doctest: +NORMALIZE_WHITESPACE
+>>> print(a_bm.data)
 [[  0.   1.   2.   3.   4.]
  [  5.   6.   7.   8.   9.]
  [ 10.  11.  12.  13.  14.]]
 
 Get the equivalent numpy array:
->>> print(a_bm.full())  # doctest: +NORMALIZE_WHITESPACE
+>>> print(a_bm.full())
 [[  5.   1.   0.   0.   0.]
  [ 10.   6.   2.   0.   0.]
  [  0.  11.   7.   3.   0.]
@@ -60,7 +65,7 @@ Get the equivalent numpy array:
  [  0.   0.   0.  13.   9.]]
 
 Take the transpose:
->>> print(a_bm.T.full())  # doctest: +NORMALIZE_WHITESPACE
+>>> print(a_bm.T.full())
 [[  5.  10.   0.   0.   0.]
  [  1.   6.  11.   0.   0.]
  [  0.   2.   7.  12.   0.]
@@ -69,7 +74,7 @@ Take the transpose:
 
 Banded matrix addition:
 >>> b_bm = bm.BandMat(0, 1, np.arange(10, dtype=np.float64).reshape((2, 5)))
->>> print((a_bm + b_bm).full())  # doctest: +NORMALIZE_WHITESPACE
+>>> print((a_bm + b_bm).full())
 [[ 10.   2.   0.   0.   0.]
  [ 10.  12.   4.   0.   0.]
  [  0.  11.  14.   6.   0.]
@@ -78,7 +83,7 @@ Banded matrix addition:
 
 Banded matrix multiplication:
 >>> b_bm = bm.BandMat(0, 1, np.arange(10, dtype=np.float64).reshape((2, 5)))
->>> print(bm.dot_mm(a_bm, b_bm).full())  # doctest: +NORMALIZE_WHITESPACE
+>>> print(bm.dot_mm(a_bm, b_bm).full())
 [[  25.   11.    2.    0.    0.]
  [  50.   46.   26.    6.    0.]
  [   0.   66.   71.   45.   12.]
