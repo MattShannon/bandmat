@@ -61,6 +61,7 @@ Installation
 For most purposes the simplest way to install bandmat is to use pip.
 For example in Debian and Ubuntu::
 
+    # (for python3, use "python3-numpy python3-scipy" instead)
     sudo apt-get install python-numpy python-scipy
     sudo pip install bandmat
 
@@ -72,6 +73,7 @@ currently uninstalled python packages required by bandmat.
 
 bandmat can also be installed in a virtualenv::
 
+    # (for python3, use "python3-numpy python3-scipy" instead)
     sudo apt-get install python-numpy python-scipy
     virtualenv --system-site-packages env
     env/bin/pip install bandmat
@@ -108,7 +110,8 @@ repository converted to a git repository using
 
 To install any currently uninstalled python packages required by bandmat::
 
-    sudo apt-get install cython cython3 python-numpy python-scipy
+    # (for python3, use "cython3 python3-numpy python3-scipy" instead)
+    sudo apt-get install cython python-numpy python-scipy
     sudo pip install -r requirements.txt
 
 To compile the cython part of bandmat in the current directory::
