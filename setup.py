@@ -61,7 +61,7 @@ else:
 
 setup(
     name='bandmat',
-    version='0.7',
+    version='0.8.dev1',
     description='A banded matrix library for python.',
     url='http://github.com/MattShannon/bandmat',
     author='Matt Shannon',
