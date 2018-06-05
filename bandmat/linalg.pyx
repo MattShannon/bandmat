@@ -278,6 +278,8 @@ def solve(a_bm, b):
 
     if a_bm.size == 0:
         x = np.zeros_like(b)
+    elif a_bm.size == 1:
+        x = b / a_bm.data[a_bm.u, 0]
     else:
         x = sla.solve_banded((a_bm.l, a_bm.u), a_bm.data, b)
     return x
