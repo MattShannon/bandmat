@@ -1,6 +1,6 @@
 if ($env:APPVEYOR_REPO_TAG -ne "true")
 {
-    $version = "dev-$($env:APPVEYOR_REPO_COMMIT.substring(0,7))";
+    $version = "dev-$($env:APPVEYOR_REPO_COMMIT.substring(0,8))";
 }
 else
 {
