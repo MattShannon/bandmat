@@ -104,17 +104,17 @@ def simple_example_with_random_parameters():
     win_mats = build_win_mats(windows, frames)
     b, prec = build_poe(b_frames, tau_frames, win_mats)
     mean_traj = bla.solveh(prec, b)
-    print 'INPUT'
-    print '-----'
-    print 'mean parameters over time:'
-    print mean_frames
-    print 'variance parameters over time:'
-    print var_frames
-    print
-    print 'OUTPUT'
-    print '------'
-    print 'mean trajectory (= maximum probability trajectory):'
-    print mean_traj
+    print('INPUT')
+    print('-----')
+    print('mean parameters over time:')
+    print(mean_frames)
+    print('variance parameters over time:')
+    print(var_frames)
+    print()
+    print('OUTPUT')
+    print('------')
+    print('mean trajectory (= maximum probability trajectory):')
+    print(mean_traj)
 
 if __name__ == '__main__':
     simple_example_with_random_parameters()

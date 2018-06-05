@@ -36,18 +36,18 @@ b_full = b_bm.full()
 c_full = c_bm.full()
 d_full = d_bm.full()
 
-print 'a_full:'
-print a_full
-print
-print 'b_full:'
-print b_full
-print
-print 'np.dot(a_full.T, b_full):'
-print c_full
-print
-print 'a_full + b_full:'
-print d_full
-print
+print('a_full:')
+print(a_full)
+print()
+print('b_full:')
+print(b_full)
+print()
+print('np.dot(a_full.T, b_full):')
+print(c_full)
+print()
+print('a_full + b_full:')
+print(d_full)
+print()
 
 c_full_again = np.dot(a_full.T, b_full)
 assert np.allclose(c_full_again, c_full)
