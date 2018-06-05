@@ -1,10 +1,23 @@
 environment:
   matrix:
     - PYTHON_VERSION: "2.7"
+      PYTHON_ARCH: "32"
       MINICONDA: "C:\\Miniconda"
 
+    - PYTHON_VERSION: "2.7"
+      PYTHON_ARCH: "64"
+      MINICONDA: "C:\\Miniconda-x64"
+
+    - PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "32"
+      MINICONDA: "C:\\Miniconda3"
+
+    - PYTHON_VERSION: "3.6"
+      PYTHON_ARCH: "64"
+      MINICONDA: "C:\\Miniconda3-x64"
+
 init:
-  - "ECHO %PYTHON_VERSION% %MINICONDA%"
+  - "ECHO %PYTHON_VERSION% %PYTHON_ARCH% %MINICONDA%"
 
 install:
   - ps: .\.appveyor_update_version.ps1
