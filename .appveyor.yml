@@ -7,6 +7,7 @@ init:
   - "ECHO %PYTHON_VERSION% %MINICONDA%"
 
 install:
+  - ps: .\.appveyor_update_version.ps1
   - "SET PATH=%MINICONDA%;%MINICONDA%\\Scripts;%PATH%"
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
