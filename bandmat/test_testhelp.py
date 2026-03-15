@@ -104,18 +104,17 @@ class TestTestHelp(unittest.TestCase):
 
             x = gen_array(ranks=[1, 2, 3])
             array_mem = th.get_array_mem(x)
-            shape = x.shape
-            strides = x.strides
+            shape_orig = x.shape
+            strides_orig = x.strides
             shape_new = x.T.shape
             strides_new = x.T.strides
-            if np.prod(shape_new) != 0:
-                x.shape = shape_new
-                x.strides = strides_new
-                if shape_new != shape or strides_new != strides:
-                    # FIXME : re-enable once I understand better when this may
-                    #   fail (i.e. when memory may be unexpectedly shared).
-                    #assert th.get_array_mem(x) != array_mem
-                    pass
+            if (np.prod(shape_new) != 0 and
+                    (shape_new != shape_orig or
+                     strides_new != strides_orig)):
+                x = np.lib.stride_tricks.as_strided(
+                    x, shape=shape_new, strides=strides_new
+                )
+                assert th.get_array_mem(x) != array_mem
 
 if __name__ == '__main__':
     unittest.main()
