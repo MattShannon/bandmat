@@ -69,4 +69,10 @@ def get_array_mem(*arrays):
     >>> x *= 2.0
     >>> assert get_array_mem(x) == array_mem
     """
-    return [ array.__array_interface__ for array in arrays ]
+    mems = []
+    for array in arrays:
+        d = dict(array.__array_interface__)
+        if d['strides'] is None:
+            d['strides'] = array.strides
+        mems.append(d)
+    return mems
