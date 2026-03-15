@@ -89,7 +89,7 @@ The source code is hosted in the
 `bandmat github repository <https://github.com/MattShannon/bandmat>`_.
 To obtain the latest source code using git::
 
-    git clone git://github.com/MattShannon/bandmat.git
+    git clone https://github.com/MattShannon/bandmat.git
 
 To install bandmat for development in a virtual environment::
 
