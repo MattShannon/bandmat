@@ -126,7 +126,7 @@ class TestLinAlg(unittest.TestCase):
                 # First part of the message is e.g. "2-th leading minor".
                 msgRe = (r'^' + re.escape(str(e)[:15]) +
                          r'.*not positive definite$')
-                with self.assertRaisesRegexp(la.LinAlgError, msgRe):
+                with self.assertRaisesRegex(la.LinAlgError, msgRe):
                     sla.cholesky(mat_bm.full(), lower=lower)
             else:
                 assert np.shape(chol_data) == (depth + 1, size)
@@ -171,12 +171,12 @@ class TestLinAlg(unittest.TestCase):
                     badFrame
                 )
                 msgRe = '^' + re.escape(msg) + '$'
-                with self.assertRaisesRegexp(la.LinAlgError, msgRe):
+                with self.assertRaisesRegex(la.LinAlgError, msgRe):
                     bla._solve_triangular_banded(
                         chol_data, b_arg, transposed=transposed, lower=lower,
                         overwrite_b=overwrite_b
                     )
-                with self.assertRaisesRegexp(la.LinAlgError, msgRe):
+                with self.assertRaisesRegex(la.LinAlgError, msgRe):
                     sla.solve_triangular(
                         chol_full, b, trans=transposed, lower=lower
                     )
@@ -299,7 +299,7 @@ class TestLinAlg(unittest.TestCase):
             if size == 0:
                 x_good = np.zeros((size,))
             else:
-                x_good = sla.solve(a_full, b, sym_pos=True)
+                x_good = sla.solve(a_full, b, assume_a='pos')
             assert_allclose(x, x_good)
             assert not np.may_share_memory(x, a_bm.data)
             assert not np.may_share_memory(x, b)

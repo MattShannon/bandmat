@@ -1,14 +1,11 @@
 bandmat
 =======
 
-|Linux build status| |Windows build status|
+|CI status|
 
-.. |Linux build status| image:: https://travis-ci.org/MattShannon/bandmat.svg?branch=master
-   :alt: Linux build status
-   :target: https://travis-ci.org/MattShannon/bandmat
-.. |Windows build status| image:: https://ci.appveyor.com/api/projects/status/cy8ouawd9bnus0ai/branch/master?svg=true
-   :alt: Windows build status
-   :target: https://ci.appveyor.com/project/MattShannon/bandmat/branch/master
+.. |CI status| image:: https://github.com/MattShannon/bandmat/actions/workflows/ci.yml/badge.svg?branch=master
+   :alt: CI status
+   :target: https://github.com/MattShannon/bandmat/actions/workflows/ci.yml
 
 This package provides a simple banded matrix library for python.
 It supports banded matrix-vector and matrix-matrix multiplication, converting
@@ -58,25 +55,15 @@ bandmat.
 Installation
 ------------
 
-For most purposes the simplest way to install bandmat is to use pip.
-For example in Debian and Ubuntu::
+For most purposes the simplest way to install bandmat is to use pip in a
+virtual environment::
 
-    # (for python3, use "python3-numpy python3-scipy" instead)
-    sudo apt-get install python-numpy python-scipy
-    sudo pip install bandmat
+    python3 -m venv env
+    env/bin/pip install bandmat
 
-The first command installs numpy and scipy from the system repository, since
-installing numpy and scipy using pip is generally not recommended.
-The second command installs the latest released version of
+This installs the latest released version of
 `bandmat on PyPI <https://pypi.python.org/pypi/bandmat>`_, together with any
 currently uninstalled python packages required by bandmat.
-
-bandmat can also be installed in a virtualenv::
-
-    # (for python3, use "python3-numpy python3-scipy" instead)
-    sudo apt-get install python-numpy python-scipy
-    virtualenv --system-site-packages env
-    env/bin/pip install bandmat
 
 The latest development version of bandmat is available from a github repository
 (see below).
@@ -104,41 +91,16 @@ To obtain the latest source code using git::
 
     git clone git://github.com/MattShannon/bandmat.git
 
-Development is in fact done using `darcs <http://darcs.net/>`_, with the darcs
-repository converted to a git repository using
-`darcs-to-git <https://github.com/purcell/darcs-to-git>`_.
+To install bandmat for development in a virtual environment::
 
-To install any currently uninstalled python packages required by bandmat::
+    python3 -m venv env
+    env/bin/pip install -e .
 
-    # (for python3, use "cython3 python3-numpy python3-scipy" instead)
-    sudo apt-get install cython python-numpy python-scipy
-    sudo pip install -r requirements.txt
-
-To compile the cython part of bandmat in the current directory::
+This will install the build dependencies (cython, numpy) and compile the
+cython extensions automatically.
+To recompile after modifying ``.pyx`` files::
 
     python setup.py build_ext --inplace
-
-This command must be run after every modification to the source ``.pyx`` files.
-
-A note on ``setup.py``
-----------------------
-
-The included ``setup.py`` file operates in one of two modes depending on
-whether or not the file ``dev`` is present in the project root directory.
-In development mode (``dev`` present, as for the github repository), the
-``build_ext`` command uses cython to compile cython modules from their ``.pyx``
-source, and the ``sdist`` command is modified to first use cython to compile
-cython modules from their ``.pyx`` source to ``.c`` files.
-In distribution mode (``dev`` absent, as for source distributions such as the
-code on PyPI), the ``build_ext`` command uses a C compiler to directly compile
-cython modules from the corresponding ``.c`` files.
-This approach ensures that source distributions can be installed on systems
-without cython or with an incompatible version of cython, while ensuring that
-distributed ``.c`` files are always up-to-date and that the source ``.pyx``
-files are used instead of ``.c`` files during development.
-
-The author would welcome any suggestions for more elegant ways to achieve a
-similar effect to the approach described above!
 
 Bugs
 ----

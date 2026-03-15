@@ -1,10 +1,12 @@
-.git/
-_darcs/
+__pycache__/
+*.pyc
+*.so
+*.c
+*.egg
+.eggs/
 bandmat.egg-info/
 build/
 dist/
 env/
+.venv/
 MANIFEST
-*.c
-*.pyc
-*.so

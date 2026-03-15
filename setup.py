@@ -6,11 +6,10 @@
 # This file is part of bandmat.
 # See `License` for details of license and warranty.
 
-import os
 import numpy as np
 from setuptools import setup
 from setuptools.extension import Extension
-from setuptools.command.sdist import sdist as _sdist
+from Cython.Build import cythonize
 
 cython_locs = [
     ('bandmat', 'full'),
@@ -26,38 +25,12 @@ with open('README.rst') as readme_file:
 
 requires = [ line.rstrip('\n') for line in open('requirements.txt') ]
 
-# see "A note on setup.py" in README.rst for an explanation of the dev file
-dev_mode = os.path.exists('dev')
-
-if dev_mode:
-    from Cython.Distutils import build_ext
-    from Cython.Build import cythonize
-
-    class sdist(_sdist):
-        """A cythonizing sdist command.
-
-        This class is a custom sdist command which ensures all cython-generated
-        C files are up-to-date before running the conventional sdist command.
-        """
-        def run(self):
-            cythonize([ os.path.join(*loc)+'.pyx' for loc in cython_locs ])
-            _sdist.run(self)
-
-    cmdclass = {'build_ext': build_ext, 'sdist': sdist}
-    ext_modules = [
-        Extension('.'.join(loc), [os.path.join(*loc)+'.pyx'],
-                  extra_compile_args=['-O3'],
-                  include_dirs=[np.get_include()])
-        for loc in cython_locs
-    ]
-else:
-    cmdclass = {}
-    ext_modules = [
-        Extension('.'.join(loc), [os.path.join(*loc)+'.c'],
-                  extra_compile_args=['-O3'],
-                  include_dirs=[np.get_include()])
-        for loc in cython_locs
-    ]
+ext_modules = cythonize([
+    Extension('.'.join(loc), ['/'.join(loc)+'.pyx'],
+              extra_compile_args=['-O3'],
+              include_dirs=[np.get_include()])
+    for loc in cython_locs
+])
 
 setup(
     name='bandmat',
@@ -70,6 +43,5 @@ setup(
     packages=['bandmat'],
     install_requires=requires,
     long_description=long_description,
-    cmdclass=cmdclass,
     ext_modules=ext_modules,
 )

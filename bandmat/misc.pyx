@@ -11,7 +11,7 @@ cimport cython
 cnp.import_array()
 cnp.import_ufunc()
 
-def fancy_plus_equals(cnp.ndarray[cnp.int_t, ndim=1] target_index_seq,
+def fancy_plus_equals(cnp.ndarray[cnp.intp_t, ndim=1] target_index_seq,
                       cnp.ndarray[cnp.float64_t, ndim=1] source,
                       cnp.ndarray[cnp.float64_t, ndim=1] target):
     """Implements a += method with fancy indexing.
@@ -26,7 +26,7 @@ def fancy_plus_equals(cnp.ndarray[cnp.int_t, ndim=1] target_index_seq,
     assert target_index_seq.shape[0] == source_size
 
     cdef unsigned long source_index
-    cdef long target_index
+    cdef cnp.intp_t target_index
 
     for source_index in range(source_size):
         target_index = target_index_seq[source_index]
@@ -34,7 +34,7 @@ def fancy_plus_equals(cnp.ndarray[cnp.int_t, ndim=1] target_index_seq,
 
     return
 
-def fancy_plus_equals_2d(cnp.ndarray[cnp.int_t, ndim=1] target_index_seq,
+def fancy_plus_equals_2d(cnp.ndarray[cnp.intp_t, ndim=1] target_index_seq,
                          cnp.ndarray[cnp.float64_t, ndim=2] source,
                          cnp.ndarray[cnp.float64_t, ndim=2] target):
     """Implements a += method with fancy indexing.
@@ -52,7 +52,7 @@ def fancy_plus_equals_2d(cnp.ndarray[cnp.int_t, ndim=1] target_index_seq,
     assert target.shape[1] == size1
 
     cdef unsigned long source_index
-    cdef long target_index
+    cdef cnp.intp_t target_index
     cdef unsigned long index1
 
     for source_index in range(source_size):
@@ -62,7 +62,7 @@ def fancy_plus_equals_2d(cnp.ndarray[cnp.int_t, ndim=1] target_index_seq,
 
     return
 
-def fancy_plus_equals_3d(cnp.ndarray[cnp.int_t, ndim=1] target_index_seq,
+def fancy_plus_equals_3d(cnp.ndarray[cnp.intp_t, ndim=1] target_index_seq,
                          cnp.ndarray[cnp.float64_t, ndim=3] source,
                          cnp.ndarray[cnp.float64_t, ndim=3] target):
     """Implements a += method with fancy indexing.
@@ -83,7 +83,7 @@ def fancy_plus_equals_3d(cnp.ndarray[cnp.int_t, ndim=1] target_index_seq,
     assert target.shape[2] == size2
 
     cdef unsigned long source_index
-    cdef long target_index
+    cdef cnp.intp_t target_index
     cdef unsigned long index1
     cdef unsigned long index2
 
