@@ -167,8 +167,7 @@ class TestLinAlg(unittest.TestCase):
             b_arg = b.copy()
             if badFrame is not None:
                 msg = (
-                    'singular matrix: resolution failed at diagonal %d' %
-                    badFrame
+                    f'singular matrix: resolution failed at diagonal {badFrame}'
                 )
                 msgRe = '^' + re.escape(msg) + '$'
                 with self.assertRaisesRegex(la.LinAlgError, msgRe):

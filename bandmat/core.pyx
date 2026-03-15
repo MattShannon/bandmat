@@ -15,7 +15,7 @@ cimport cython
 cnp.import_array()
 cnp.import_ufunc()
 
-class BandMat(object):
+class BandMat:
     """A memory-efficient representation of a square banded matrix.
 
     An N by N matrix with bandwidth D can be stored efficiently by storing its
@@ -56,8 +56,7 @@ class BandMat(object):
         assert self.data.shape[0] == self.l + self.u + 1
 
     def __repr__(self):
-        return ('BandMat(%r, %r, %r, transposed=%r)' %
-                (self.l, self.u, self.data, self.transposed))
+        return f'BandMat({self.l!r}, {self.u!r}, {self.data!r}, transposed={self.transposed!r})'
 
     @property
     def size(self):
@@ -344,7 +343,7 @@ class BandMat(object):
         """
         try:
             mult = float(other)
-        except:
+        except (TypeError, ValueError):
             return NotImplemented
 
         return BandMat(self.l, self.u, self.data * mult,
@@ -365,36 +364,16 @@ class BandMat(object):
         """
         try:
             mult = float(other)
-        except:
+        except (TypeError, ValueError):
             return NotImplemented
 
         return BandMat(self.l, self.u, self.data.__floordiv__(mult),
                        transposed=self.transposed)
 
-    def __div__(self, other):
-        """Old-style divides a banded matrix by a scalar.
-
-        When using old-style division (c.f. `from __future__ import division`),
-        the expression `a_bm / mult` where `a_bm` is a BandMat is the
-        equivalent of:
-
-            a_full / mult
-
-        where `a_full` is a square numpy array.
-        """
-        try:
-            mult = float(other)
-        except:
-            return NotImplemented
-
-        return BandMat(self.l, self.u, self.data.__div__(mult),
-                       transposed=self.transposed)
-
     def __truediv__(self, other):
         """Divides a banded matrix by a scalar.
 
-        When using new-style division (c.f. `from __future__ import division`),
-        the expression `a_bm / mult` where `a_bm` is a BandMat is the
+        The expression `a_bm / mult` where `a_bm` is a BandMat is the
         equivalent of:
 
             a_full / mult
@@ -403,7 +382,7 @@ class BandMat(object):
         """
         try:
             mult = float(other)
-        except:
+        except (TypeError, ValueError):
             return NotImplemented
 
         return BandMat(self.l, self.u, self.data.__truediv__(mult),
@@ -421,7 +400,7 @@ class BandMat(object):
         """
         try:
             mult = float(other)
-        except:
+        except (TypeError, ValueError):
             return NotImplemented
 
         self.data *= mult
@@ -439,36 +418,16 @@ class BandMat(object):
         """
         try:
             mult = float(other)
-        except:
+        except (TypeError, ValueError):
             return NotImplemented
 
         self.data.__ifloordiv__(mult)
         return self
 
-    def __idiv__(self, other):
-        """Old-style divides this matrix by a scalar in-place.
-
-        When using old-style division (c.f. `from __future__ import division`),
-        the expression `a_bm /= mult` where `a_bm` is a BandMat is the
-        equivalent of:
-
-            a_full /= mult
-
-        where `a_full` is a square numpy array.
-        """
-        try:
-            mult = float(other)
-        except:
-            return NotImplemented
-
-        self.data.__itruediv__(mult)
-        return self
-
     def __itruediv__(self, other):
         """Divides this matrix by a scalar in-place.
 
-        When using new-style division (c.f. `from __future__ import division`),
-        the expression `a_bm /= mult` where `a_bm` is a BandMat is the
+        The statement `a_bm /= mult` where `a_bm` is a BandMat is the
         equivalent of:
 
             a_full /= mult
@@ -477,7 +436,7 @@ class BandMat(object):
         """
         try:
             mult = float(other)
-        except:
+        except (TypeError, ValueError):
             return NotImplemented
 
         self.data.__itruediv__(mult)
