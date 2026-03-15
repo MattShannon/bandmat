@@ -76,7 +76,7 @@ def _cholesky_banded(cnp.ndarray[cnp.float64_t, ndim=2] mat,
         v0 = mat[<unsigned long>(0), frame]
         if v0 <= 0.0:
             raise sla.LinAlgError(
-                '%d-th leading minor not positive definite' % (frame + 1)
+                f'{frame + 1}-th leading minor not positive definite'
             )
         iv0 = 1.0 / v0
         siv0 = sqrt(iv0)
@@ -167,7 +167,7 @@ def _solve_triangular_banded(cnp.ndarray[cnp.float64_t, ndim=2] a_rect,
                 denom = a_rect[depth, frame]
         if denom == 0.0:
             raise sla.LinAlgError(
-                'singular matrix: resolution failed at diagonal %d' % frame
+                f'singular matrix: resolution failed at diagonal {frame}'
             )
         x[frame] = diff / denom
 
