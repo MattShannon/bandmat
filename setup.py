@@ -41,6 +41,7 @@ setup(
     author_email='matt.shannon@cantab.net',
     license='3-clause BSD (see License file)',
     packages=['bandmat'],
+    python_requires='>=3.9',
     install_requires=requires,
     long_description=long_description,
     ext_modules=ext_modules,
